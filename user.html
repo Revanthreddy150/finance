@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAVEEN FINANCE</title>
+    <style>
+        :root {
+            --dark-teal: #005F73;
+            --slate-blue: #4A6B82;
+            --ice-blue: #E0F2FE;
+            --white: #FFFFFF;
+            --cream-offwhite: #FDFBF7;
+            --light-gray: #E5E7EB;
+            --shadow-gray: rgba(0, 0, 0, 0.08);
+            --red-logout: #DC2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            min-height: 100vh;
+            width: 100vw;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Full Screen Container */
+        .fullscreen-container {
+            width: 100vw;
+            min-height: 100vh;
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Brand Image */
+        .top-brand-img {
+            max-width: 220px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 16px auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* Form Wrapper */
+        .form-wrapper {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Titles */
+        .title-group {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .title-group h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .title-group p {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--slate-blue);
+            letter-spacing: 0.15em;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid var(--light-gray);
+            border-radius: 30px;
+            font-size: 15px;
+            outline: none;
+            background-color: var(--cream-offwhite);
+            transition: all 0.2s ease;
+            color: var(--dark-teal);
+        }
+
+        .input-group input:focus {
+            border-color: var(--dark-teal);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(0, 95, 115, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-filled {
+            background-color: var(--dark-teal);
+            color: var(--white);
+        }
+
+        .btn-filled:hover {
+            opacity: 0.95;
+        }
+
+        .btn-outlined {
+            background-color: transparent;
+            border: 2px solid var(--dark-teal);
+            color: var(--dark-teal);
+        }
+
+        .btn-outlined:hover {
+            background-color: var(--ice-blue);
+        }
+
+        .btn-logout {
+            background-color: var(--red-logout);
+            color: var(--white);
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        /* Mode Switch Link */
+        .toggle-mode-text {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--slate-blue);
+        }
+
+        .toggle-mode-text span {
+            color: var(--dark-teal);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Google Social Login Section */
+        .social-section {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        .social-section p {
+            font-size: 12px;
+            color: var(--slate-blue);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid var(--light-gray);
+            box-shadow: 0 4px 12px var(--shadow-gray);
+            transition: transform 0.2s;
+            background-color: var(--white);
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 3D Earth Globe Spinner */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .globe-container {
+            width: 110px;
+            height: 110px;
+            position: relative;
+            perspective: 400px;
+            margin-bottom: 24px;
+        }
+
+        .earth-globe {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #00829B, var(--dark-teal));
+            position: relative;
+            box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 95, 115, 0.4);
+            overflow: hidden;
+            animation: rotateGlobe 5s infinite linear;
+        }
+
+        .earth-globe::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            border: 2px dashed rgba(224, 242, 254, 0.6);
+            transform: rotateX(65deg) rotateY(15deg);
+        }
+
+        .earth-globe::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 50%;
+            border-radius: 50%;
+            border: 2px dashed rgba(224, 242, 254, 0.4);
+            transform: rotateX(65deg) rotateY(-35deg);
+        }
+
+        @keyframes rotateGlobe {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            letter-spacing: 0.05em;
+        }
+
+        .loading-sub {
+            font-size: 14px;
+            color: var(--slate-blue);
+            margin-top: 6px;
+        }
+
+        /* User Dashboard Screen */
+        .dashboard-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 32px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .drawer-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: var(--cream-offwhite);
+            border: 1px solid var(--light-gray);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px var(--shadow-gray);
+            transition: background-color 0.2s;
+        }
+
+        .drawer-icon:hover {
+            background-color: var(--ice-blue);
+        }
+
+        .drawer-icon span {
+            width: 20px;
+            height: 2px;
+            background-color: var(--dark-teal);
+            border-radius: 2px;
+        }
+
+        .avatar-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--dark-teal);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px var(--shadow-gray);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .avatar-circle:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-popover {
+            position: absolute;
+            top: 90px;
+            right: 32px;
+            width: 320px;
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            z-index: 10;
+        }
+
+        .center-dashboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .coming-soon-title {
+            font-size: 52px;
+            font-weight: 900;
+            color: var(--dark-teal);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .coming-soon-sub {
+            font-size: 15px;
+            color: var(--slate-blue);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .info-card {
+            background-color: var(--cream-offwhite);
+            border: 1px solid var(--light-gray);
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--dark-teal);
+            word-break: break-all;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fullscreen-container">
+
+        <!-- 1. AUTH SCREEN (LOGIN / SIGNUP) -->
+        <div id="authScreen" class="form-wrapper" style="text-align: center;">
+            
+            <!-- Top Brand Image -->
+            <img src="https://file.garden/abrK4_rpWxJegn7w/full%20nr.png" alt="Logo" class="top-brand-img">
+
+            <div class="title-group">
+                <h1 id="authTitle">NAVEEN FINANCE</h1>
+                <p>SMART PORTFOLIO &amp; WEALTH MANAGEMENT</p>
+            </div>
+
+            <form id="authForm">
+                <!-- Full Name Input (Appears only on Sign Up) -->
+                <div class="input-group hidden" id="nameInputGroup">
+                    <input type="text" id="signUpName" placeholder="Full Name">
+                </div>
+                
+                <!-- Email Input -->
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="Email Address" required>
+                </div>
+                
+                <!-- Password Input -->
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="btnSubmitAuth" class="btn btn-filled">Login</button>
+            </form>
+
+            <!-- Mode Switch Toggle -->
+            <div class="toggle-mode-text">
+                <span id="toggleText">Don't have an account? Sign Up</span>
+            </div>
+
+            <div class="social-section">
+                <p>Or via Google</p>
+                <div class="social-icons">
+                    <button type="button" id="btnGoogleLogin" class="social-btn" title="Sign in with Google">
+                        <svg width="24" height="24" viewBox="0 0 18 18">
+                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                            <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 5-SECOND 3D EARTH GLOBE LOADING SCREEN -->
+        <div id="loadingScreen" class="loading-container hidden">
+            <div class="globe-container">
+                <div class="earth-globe"></div>
+            </div>
+            <div class="loading-text">Securing Your Session...</div>
+            <div class="loading-sub">Loading your portfolio dashboard</div>
+        </div>
+
+        <!-- 3. USER DASHBOARD SCREEN -->
+        <div id="userScreen" class="dashboard-container hidden">
+            
+            <div class="dashboard-header">
+                <!-- Drawer Icon (3 Lines) -->
+                <div class="drawer-icon" title="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <!-- Profile Avatar Circle -->
+                <div id="userAvatar" class="avatar-circle" title="View Profile">U</div>
+            </div>
+
+            <!-- Center Dashboard Placeholder -->
+            <div class="center-dashboard">
+                <div class="coming-soon-title">COMING SOON</div>
+                <div class="coming-soon-sub">We are crafting your financial dashboard</div>
+            </div>
+
+            <!-- Profile Details Popover -->
+            <div id="profilePopover" class="profile-popover hidden">
+                <h3 style="font-size: 18px; color: var(--dark-teal); margin-bottom: 4px;" id="welcomeTitle">User Profile</h3>
+                <p style="font-size: 12px; color: var(--slate-blue); margin-bottom: 12px;">Account Information</p>
+
+                <div class="info-card">
+                    <strong id="displayEmail">Email: user@example.com</strong>
+                </div>
+
+                <!-- Google Setup Block -->
+                <div id="googleSetupBox" class="hidden" style="margin-bottom: 16px; border-bottom: 1px solid var(--light-gray); padding-bottom: 12px;">
+                    <p style="font-size: 12px; font-weight: bold; color: var(--dark-teal); margin-bottom: 8px;">Complete Setup</p>
+                    <div class="input-group">
+                        <input type="text" id="setupName" placeholder="Set Your Name">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="setupPassword" placeholder="Set Account Password">
+                    </div>
+                    <button type="button" id="btnSaveGoogleSetup" class="btn btn-filled" style="padding: 10px; font-size: 13px;">Save Setup</button>
+                </div>
+
+                <!-- Main Profile Update Form -->
+                <form id="profileForm">
+                    <div class="input-group">
+                        <input type="text" id="userName" placeholder="Full Name">
+                    </div>
+                    <div class="input-group">
+                        <input type="tel" id="userPhone" placeholder="Phone Number">
+                    </div>
+                    <button type="submit" class="btn btn-filled" style="padding: 12px; font-size: 14px;">Save Details</button>
+                </form>
+
+                <button type="button" id="btnLogout" class="btn btn-logout" style="padding: 12px; font-size: 14px;">Logout</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FIREBASE SERVICES MODULE SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            updatePassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKbbbmhhJ15LDACmQfE-7gQebx32YMYgc",
+            authDomain: "jthacks-bcf0b.firebaseapp.com",
+            databaseURL: "https://jthacks-bcf0b-default-rtdb.firebaseio.com",
+            projectId: "jthacks-bcf0b",
+            storageBucket: "jthacks-bcf0b.firebasestorage.app",
+            messagingSenderId: "786755260274",
+            appId: "1:786755260274:web:ae8d94443cb66efd69d7eb",
+            measurementId: "G-2YDM7L57FL"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Elements
+        const authScreen = document.getElementById('authScreen');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const userScreen = document.getElementById('userScreen');
+        const authForm = document.getElementById('authForm');
+        const nameInputGroup = document.getElementById('nameInputGroup');
+        const signUpName = document.getElementById('signUpName');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const btnSubmitAuth = document.getElementById('btnSubmitAuth');
+        const toggleText = document.getElementById('toggleText');
+        const btnGoogleLogin = document.getElementById('btnGoogleLogin');
+        const displayEmail = document.getElementById('displayEmail');
+        const userAvatar = document.getElementById('userAvatar');
+        const profilePopover = document.getElementById('profilePopover');
+        const userName = document.getElementById('userName');
+        const userPhone = document.getElementById('userPhone');
+        const welcomeTitle = document.getElementById('welcomeTitle');
+        const profileForm = document.getElementById('profileForm');
+        const googleSetupBox = document.getElementById('googleSetupBox');
+        const setupNameInput = document.getElementById('setupName');
+        const setupPasswordInput = document.getElementById('setupPassword');
+        const btnSaveGoogleSetup = document.getElementById('btnSaveGoogleSetup');
+        const btnLogout = document.getElementById('btnLogout');
+
+        let isSignUpMode = false;
+        let isInitialLoad = true;
+
+        // Toggle between Login and Sign Up modes
+        toggleText.addEventListener('click', () => {
+            isSignUpMode = !isSignUpMode;
+            if (isSignUpMode) {
+                nameInputGroup.classList.remove('hidden');
+                signUpName.setAttribute('required', 'true');
+                btnSubmitAuth.innerText = 'Create Account';
+                toggleText.innerText = 'Already have an account? Login';
+            } else {
+                nameInputGroup.classList.add('hidden');
+                signUpName.removeAttribute('required');
+                btnSubmitAuth.innerText = 'Login';
+                toggleText.innerText = "Don't have an account? Sign Up";
+            }
+        });
+
+        // Toggle Profile Popover
+        userAvatar.addEventListener('click', () => {
+            profilePopover.classList.toggle('hidden');
+        });
+
+        // Monitor Auth State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                    runLoadingScreen(() => showUserDashboard(user));
+                }
+            } else {
+                isInitialLoad = false;
+                authScreen.classList.remove('hidden');
+                loadingScreen.classList.add('hidden');
+                userScreen.classList.add('hidden');
+            }
+        });
+
+        // 5-Second 3D Globe Loading Screen Handler
+        function runLoadingScreen(callback) {
+            authScreen.classList.add('hidden');
+            userScreen.classList.add('hidden');
+            loadingScreen.classList.remove('hidden');
+
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                callback();
+            }, 5000);
+        }
+
+        // Form Submit Handler
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+
+            if (isSignUpMode) {
+                const name = signUpName.value.trim();
+                if (!name) {
+                    alert("Please enter your Full Name.");
+                    return;
+                }
+
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        localStorage.setItem('name_' + email, name);
+                        runLoadingScreen(() => showUserDashboard(userCredential.user));
+                    })
+                    .catch((error) => alert("Sign Up Error: " + error.message));
+            } else {
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        runLoadingScreen(() => showUserDashboard(userCredential.user));
+                    })
+                    .catch((error) => alert("Login Error: " + error.message));
+            }
+        });
+
+        // Google Popup Login
+        btnGoogleLogin.addEventListener('click', () => {
+            signInWithPopup(auth, googleProvider)
+                .then((result) => {
+                    runLoadingScreen(() => showUserDashboard(result.user));
+                })
+                .catch((error) => alert("Google Sign-In Error: " + error.message));
+        });
+
+        // Show User Dashboard
+        function showUserDashboard(user) {
+            authScreen.classList.add('hidden');
+            loadingScreen.classList.add('hidden');
+            userScreen.classList.remove('hidden');
+
+            const email = user.email || "";
+            displayEmail.innerText = "Email: " + email;
+
+            const savedName = localStorage.getItem('name_' + email) || user.displayName || "";
+            const savedPhone = localStorage.getItem('phone_' + email) || "";
+
+            if (savedName) {
+                userAvatar.innerText = savedName.charAt(0).toUpperCase();
+                welcomeTitle.innerText = savedName;
+            } else if (email) {
+                userAvatar.innerText = email.charAt(0).toUpperCase();
+                welcomeTitle.innerText = "User Profile";
+            }
+
+            userName.value = savedName;
+            userPhone.value = savedPhone;
+
+            const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+            const hasPassword = user.providerData.some(p => p.providerId === 'password');
+
+            if (isGoogleUser && (!savedName || !hasPassword)) {
+                googleSetupBox.classList.remove('hidden');
+                profilePopover.classList.remove('hidden');
+            } else {
+                googleSetupBox.classList.add('hidden');
+            }
+        }
+
+        // Complete Setup for Google Sign-Ins
+        btnSaveGoogleSetup.addEventListener('click', () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = setupNameInput.value.trim();
+            const newPassword = setupPasswordInput.value.trim();
+
+            if (!name) {
+                alert("Please enter your name.");
+                return;
+            }
+            if (newPassword.length < 6) {
+                alert("Password must be at least 6 characters.");
+                return;
+            }
+
+            localStorage.setItem('name_' + user.email, name);
+            welcomeTitle.innerText = name;
+            userName.value = name;
+            userAvatar.innerText = name.charAt(0).toUpperCase();
+
+            updatePassword(user, newPassword)
+                .then(() => {
+                    alert("Account setup completed!");
+                    googleSetupBox.classList.add('hidden');
+                })
+                .catch((error) => alert("Setup error: " + error.message));
+        });
+
+        // Save Profile Details
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = userName.value.trim();
+            const phone = userPhone.value.trim();
+
+            localStorage.setItem('name_' + user.email, name);
+            localStorage.setItem('phone_' + user.email, phone);
+
+            if (name) {
+                welcomeTitle.innerText = name;
+                userAvatar.innerText = name.charAt(0).toUpperCase();
+            }
+
+            alert("Profile details saved!");
+            profilePopover.classList.add('hidden');
+        });
+
+        // Logout
+        btnLogout.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                authForm.reset();
+                profilePopover.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
