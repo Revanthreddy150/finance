@@ -520,6 +520,7 @@
     </div>
 
     <!-- FIREBASE SERVICES MODULE SCRIPT -->
+    <!-- FIREBASE SERVICES MODULE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -530,7 +531,9 @@
             createUserWithEmailAndPassword, 
             updatePassword, 
             signOut, 
-            onAuthStateChanged 
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 
@@ -550,7 +553,13 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
+
+        // Configure Local Storage persistence for WebViews
+        setPersistence(auth, browserLocalPersistence).catch((err) => console.log("Persistence setup err: " + err.message));
+
         const googleProvider = new GoogleAuthProvider();
+        // Force Google to show account selection prompt
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         // Elements
         const authScreen = document.getElementById('authScreen');
@@ -656,13 +665,15 @@
             }
         });
 
-        // Google Popup Login
+        // Google Popup Login Fixed for WebViews
         btnGoogleLogin.addEventListener('click', () => {
             signInWithPopup(auth, googleProvider)
                 .then((result) => {
                     runLoadingScreen(() => showUserDashboard(result.user));
                 })
-                .catch((error) => alert("Google Sign-In Error: " + error.message));
+                .catch((error) => {
+                    alert("Google Sign-In Error: " + error.message);
+                });
         });
 
         // Show User Dashboard
