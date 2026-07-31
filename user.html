@@ -520,12 +520,12 @@
     </div>
 
     <!-- FIREBASE SERVICES MODULE SCRIPT -->
-    <!-- FIREBASE SERVICES MODULE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
             getAuth, 
             signInWithPopup, 
+            signInWithCredential,
             GoogleAuthProvider, 
             signInWithEmailAndPassword, 
             createUserWithEmailAndPassword, 
@@ -558,7 +558,6 @@
         setPersistence(auth, browserLocalPersistence).catch((err) => console.log("Persistence setup err: " + err.message));
 
         const googleProvider = new GoogleAuthProvider();
-        // Force Google to show account selection prompt
         googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         // Elements
@@ -665,16 +664,39 @@
             }
         });
 
-        // Google Popup Login Fixed for WebViews
+        // Google Sign-In: Prefers Native Android Bridge when running in Android App
         btnGoogleLogin.addEventListener('click', () => {
-            signInWithPopup(auth, googleProvider)
+            if (window.AndroidBridge && window.AndroidBridge.launchGoogleSignIn) {
+                // Launch native Android Google Account selector
+                window.AndroidBridge.launchGoogleSignIn();
+            } else {
+                // Fallback for standard browsers
+                signInWithPopup(auth, googleProvider)
+                    .then((result) => {
+                        runLoadingScreen(() => showUserDashboard(result.user));
+                    })
+                    .catch((error) => {
+                        alert("Google Sign-In Error: " + error.message);
+                    });
+            }
+        });
+
+        // Callback function called by Android Kotlin code on successful account pick
+        window.handleNativeGoogleSuccess = function(idToken) {
+            const credential = GoogleAuthProvider.credential(idToken);
+            signInWithCredential(auth, credential)
                 .then((result) => {
                     runLoadingScreen(() => showUserDashboard(result.user));
                 })
                 .catch((error) => {
-                    alert("Google Sign-In Error: " + error.message);
+                    alert("Firebase Native Auth Error: " + error.message);
                 });
-        });
+        };
+
+        // Callback function called by Android Kotlin code on sign-in error or cancel
+        window.handleNativeGoogleError = function(errorMsg) {
+            alert("Native Sign-In Cancelled/Error: " + errorMsg);
+        };
 
         // Show User Dashboard
         function showUserDashboard(user) {
