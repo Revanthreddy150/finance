@@ -144,6 +144,11 @@
             margin-top: 24px;
         }
 
+        .btn-secondary {
+            background-color: var(--slate-blue);
+            color: var(--white);
+        }
+
         /* Toggle Mode Link */
         .toggle-mode-text {
             text-align: center;
@@ -523,6 +528,48 @@
             color: var(--white);
         }
 
+        /* Header bar inside day screen with History Button */
+        .day-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .btn-history-pill {
+            background-color: var(--ice-blue);
+            color: var(--dark-teal);
+            border: 2px solid var(--dark-teal);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-history-pill:hover {
+            background-color: var(--dark-teal);
+            color: var(--white);
+        }
+
+        /* Search input styling */
+        .search-input-group {
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+
+        .search-input-group input {
+            width: 100%;
+            padding: 12px 18px;
+            border: 1.5px solid var(--dark-teal);
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            background-color: var(--cream-offwhite);
+            color: var(--dark-teal);
+        }
+
         /* Page Layout Styles */
         .page-content-wrapper {
             width: 100%;
@@ -538,7 +585,6 @@
             font-size: 18px;
             font-weight: 800;
             color: var(--dark-teal);
-            margin-top: 10px;
         }
 
         .village-spinner {
@@ -639,6 +685,8 @@
             display: flex;
             flex-direction: column;
             gap: 14px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-title {
@@ -647,17 +695,6 @@
             color: var(--dark-teal);
             margin-bottom: 4px;
             text-align: center;
-        }
-
-        /* Signature Canvas Pad */
-        .signature-canvas {
-            width: 100%;
-            height: 160px;
-            border: 2px dashed var(--dark-teal);
-            border-radius: 16px;
-            background-color: var(--white);
-            touch-action: none;
-            cursor: crosshair;
         }
 
         /* 12-Weeks Item Cards */
@@ -675,6 +712,11 @@
         .week-item-card.paid {
             border-color: var(--green-paid);
             background-color: #F0FDF4;
+        }
+
+        .week-item-card.partial {
+            border-color: var(--red-logout);
+            background-color: #FEF2F2;
         }
 
         .week-title {
@@ -703,6 +745,11 @@
             color: var(--green-paid);
         }
 
+        .status-badge.partial {
+            background-color: #FEE2E2;
+            color: var(--red-logout);
+        }
+
         .profile-popover {
             position: absolute;
             top: 80px;
@@ -727,6 +774,42 @@
             word-break: break-all;
         }
 
+        /* History Card Item */
+        .history-card {
+            background-color: var(--cream-offwhite);
+            border: 1.5px solid var(--dark-teal);
+            border-radius: 16px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 2px 8px var(--shadow-gray);
+        }
+
+        .history-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            color: var(--dark-teal);
+            font-size: 15px;
+        }
+
+        .history-card-sub {
+            font-size: 13px;
+            color: var(--slate-blue);
+            font-weight: 600;
+        }
+
+        .history-card-badge {
+            background-color: var(--ice-blue);
+            color: var(--dark-teal);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -748,7 +831,7 @@
         <div id="authScreen" class="form-wrapper" style="text-align: center;">
             <img src="https://file.garden/abrK4_rpWxJegn7w/full%20nr.png" alt="Logo" class="top-brand-img">
             <div class="title-group">
-                <h1 id="authTitle">NAVEEN FINANCE</h1>
+                <h1 id="authTitle">SRI FINANCE</h1>
                 <p>SMART PORTFOLIO &amp; WEALTH MANAGEMENT</p>
             </div>
 
@@ -800,7 +883,7 @@
                 <span></span>
                 <span></span>
             </div>
-            <div class="header-app-title">NAVEEN FINANCE</div>
+            <div class="header-app-title">SRI FINANCE</div>
             <div id="userAvatar" class="avatar-circle" title="View Profile">U</div>
         </div>
 
@@ -867,17 +950,26 @@
         <!-- 4. DAY PAGE (Mon / Tue / Wed View) -->
         <div id="dayPageScreen" class="dashboard-container hidden" style="padding-top: 100px;">
             <div class="page-content-wrapper">
-                <div class="page-section-title" id="dayPageHeaderTitle">Select the Village</div>
+                <div class="day-header-flex">
+                    <div class="page-section-title" id="dayPageHeaderTitle">Select the Village</div>
+                    <button class="btn-history-pill" onclick="openDayHistoryView()">History</button>
+                </div>
+                
                 <select id="villageSelectSpinner" class="village-spinner">
                     <option value="">No villages added</option>
                 </select>
 
+                <!-- Search Input for Tokens -->
+                <div class="search-input-group">
+                    <input type="text" id="tokenSearchInput" placeholder="Search Token No. or Person Name...">
+                </div>
+
                 <!-- Tokens List Container -->
-                <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;" id="villageTokensList">
+                <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 12px;" id="villageTokensList">
                     <!-- Dynamic Token Cards Render Here -->
                 </div>
 
-                <button class="btn btn-filled" onclick="showDashboardHome()" style="margin-top: 20px; background-color: var(--slate-blue);">Back to Home</button>
+                <button class="btn btn-secondary" onclick="showDashboardHome()" style="margin-top: 20px;">Back to Home</button>
             </div>
 
             <!-- Floating Plus Action Button (+) -->
@@ -906,7 +998,7 @@
                     <div id="currentVillagesList" style="font-size: 13px; color: var(--slate-blue);">None</div>
                 </div>
 
-                <button class="btn btn-filled" onclick="showDashboardHome()" style="margin-top: 20px; background-color: var(--slate-blue);">Back to Home</button>
+                <button class="btn btn-secondary" onclick="showDashboardHome()" style="margin-top: 20px;">Back to Home</button>
             </div>
         </div>
 
@@ -915,10 +1007,19 @@
             <div class="page-content-wrapper">
                 <div style="background-color: var(--cream-offwhite); border: 2px solid var(--dark-teal); border-radius: 20px; padding: 16px;">
                     <div style="font-size: 18px; font-weight: 900; color: var(--dark-teal);" id="scheduleTokenNum">Token #---</div>
-                    <div style="font-size: 13px; font-weight: 700; color: var(--slate-blue); margin-top: 4px;" id="scheduleVillageName">Village: ---</div>
+                    <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal); margin-top: 4px;" id="schedulePersonName">Name: ---</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--slate-blue); margin-top: 2px;" id="scheduleNomineeName">Nominee: --- | Ph: ---</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--slate-blue); margin-top: 2px;" id="scheduleVillageName">Village: ---</div>
+                    
                     <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 13px; font-weight: 800; color: var(--dark-teal);">
                         <span id="scheduleTotalMoney">Total: ₹0</span>
                         <span id="scheduleWeeklyMoney">Weekly: ₹0</span>
+                    </div>
+
+                    <!-- Live Progress Summary -->
+                    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--light-gray); display: flex; justify-content: space-between; font-size: 13px; font-weight: 800;">
+                        <span style="color: var(--green-paid);" id="schedulePaidSoFar">Paid: ₹0</span>
+                        <span style="color: var(--red-logout);" id="scheduleBalanceRemaining">Remaining: ₹0</span>
                     </div>
                 </div>
 
@@ -928,7 +1029,35 @@
                     <!-- 12 Weeks Entries render here dynamically -->
                 </div>
 
-                <button class="btn btn-filled" onclick="returnToDayPage()" style="margin-top: 15px; background-color: var(--slate-blue);">Back</button>
+                <button class="btn btn-secondary" onclick="returnToDayPage()" style="margin-top: 15px;">Back</button>
+            </div>
+        </div>
+
+        <!-- 7. DAY HISTORY SCREEN -->
+        <div id="dayHistoryScreen" class="dashboard-container hidden" style="padding-top: 100px;">
+            <div class="page-content-wrapper">
+                <div class="page-section-title" id="historyHeaderTitle">Payment History</div>
+                
+                <div class="input-group">
+                    <label style="font-size: 12px; font-weight: 800; color: var(--dark-teal); margin-bottom: 4px; display: block;">Select History Date:</label>
+                    <input type="date" id="historyDatePicker">
+                </div>
+
+                <!-- Daily Summary Stats Card -->
+                <div style="background-color: var(--cream-offwhite); border: 2px solid var(--dark-teal); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">Day Totals Breakdown</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--slate-blue);">
+                        <span>Total Paid: <strong style="color: var(--green-paid);" id="histTotalPaid">₹0</strong></span>
+                        <span>Cash: <strong style="color: var(--dark-teal);" id="histTotalCash">₹0</strong></span>
+                        <span>UPI: <strong style="color: var(--dark-teal);" id="histTotalUpi">₹0</strong></span>
+                    </div>
+                </div>
+
+                <div id="historyEntriesList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+                    <!-- Dynamic History Cards Render Here -->
+                </div>
+
+                <button class="btn btn-secondary" onclick="returnToDayPage()" style="margin-top: 15px;">Back</button>
             </div>
         </div>
 
@@ -942,20 +1071,29 @@
                 <input type="text" id="tokenNumInput" placeholder="Token Number (e.g. T-101)">
             </div>
             <div class="input-group">
-                <input type="number" id="tokenTotalMoneyInput" placeholder="Total Money (₹)">
+                <input type="text" id="tokenPersonNameInput" placeholder="Name of the Person">
             </div>
             <div class="input-group">
-                <input type="number" id="tokenWeeklyMoneyInput" placeholder="Weekly Money (₹)">
+                <input type="text" id="tokenNomineeNameInput" placeholder="Nominee of the Person">
+            </div>
+            <div class="input-group">
+                <input type="tel" id="tokenPhoneInput" placeholder="Phone Number">
+            </div>
+            <div class="input-group">
+                <input type="number" id="tokenTotalMoneyInput" placeholder="Total Amount Given (₹)">
+            </div>
+            <div class="input-group">
+                <input type="number" id="tokenWeeklyMoneyInput" placeholder="Weekly Amount (₹)">
             </div>
             <div class="input-group">
                 <input type="date" id="tokenStartDateInput">
             </div>
             <button type="button" id="btnSubmitToken" class="btn btn-filled">Submit Entry</button>
-            <button type="button" id="btnCloseTokenModal" class="btn btn-filled" style="background-color: var(--slate-blue); margin-top: 0;">Cancel</button>
+            <button type="button" id="btnCloseTokenModal" class="btn btn-secondary" style="margin-top: 0;">Cancel</button>
         </div>
     </div>
 
-    <!-- MODAL: PAYMENT & SIGNATURE FORM -->
+    <!-- MODAL: PAYMENT FORM -->
     <div id="paymentModal" class="modal-overlay hidden">
         <div class="modal-box" style="max-width: 400px;">
             <div class="modal-title" id="paymentModalWeekTitle">Week Payment</div>
@@ -966,15 +1104,20 @@
                 </div>
                 <div class="input-group">
                     <select id="payMethodSelect">
-                        <option value="UPI">UPI</option>
                         <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Both">Both (Cash & UPI)</option>
                     </select>
                 </div>
 
-                <div style="font-size: 13px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Customer Signature:</div>
-                <canvas id="sigCanvas" class="signature-canvas"></canvas>
-                <div style="display: flex; gap: 10px; margin-top: 6px;">
-                    <button type="button" id="btnClearSig" class="btn btn-filled" style="padding: 8px; font-size: 12px; background-color: var(--slate-blue);">Clear Signature</button>
+                <!-- Dynamic Inputs for 'Both' Payment Option -->
+                <div id="bothAmountGroup" class="hidden">
+                    <div class="input-group">
+                        <input type="number" id="payUpiAmountInput" placeholder="UPI Amount (₹)">
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="payCashAmountInput" placeholder="Cash Amount (₹)">
+                    </div>
                 </div>
 
                 <button type="button" id="btnSubmitPayment" class="btn btn-filled" style="margin-top: 14px;">Confirm & Submit</button>
@@ -982,14 +1125,19 @@
 
             <!-- Already Paid View -->
             <div id="paidDetailsSection" class="hidden" style="text-align: center;">
-                <div style="font-size: 16px; font-weight: 900; color: var(--green-paid); margin-bottom: 10px;">Already Paid</div>
-                <div id="paidAmountText" style="font-size: 14px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Amount Paid: ₹0</div>
-                <div id="paidMethodText" style="font-size: 13px; font-weight: 700; color: var(--slate-blue); margin-bottom: 12px;">Method: ---</div>
-                <div style="font-size: 12px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Recorded Signature:</div>
-                <img id="paidSigImage" src="" alt="Signature" style="max-width: 100%; border: 1px solid var(--light-gray); border-radius: 12px; background: white; padding: 4px;">
+                <div style="font-size: 16px; font-weight: 900; color: var(--green-paid); margin-bottom: 10px;" id="paidStatusHeader">Payment Recorded</div>
+                <div id="paidAmountText" style="font-size: 15px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Total Amount: ₹0</div>
+                <div id="paidMethodText" style="font-size: 14px; font-weight: 700; color: var(--slate-blue); margin-bottom: 6px;">Method: ---</div>
+                <div id="paidTimestampText" style="font-size: 12px; font-weight: 600; color: var(--slate-blue); margin-bottom: 8px;">Submitted At: ---</div>
+                
+                <div id="paidBreakdownText" class="hidden" style="font-size: 13px; font-weight: 700; color: var(--dark-teal); background-color: var(--cream-offwhite); padding: 10px; border-radius: 12px; border: 1px solid var(--light-gray); margin-bottom: 10px;">
+                    <!-- UPI & Cash Breakdown displays here -->
+                </div>
+
+                <button type="button" id="btnEditPayment" class="btn btn-filled" style="background-color: var(--dark-teal); margin-top: 6px;">Pay / Update Remaining</button>
             </div>
 
-            <button type="button" id="btnClosePaymentModal" class="btn btn-filled" style="background-color: var(--slate-blue); margin-top: 10px;">Close</button>
+            <button type="button" id="btnClosePaymentModal" class="btn btn-secondary" style="margin-top: 10px;">Close</button>
         </div>
     </div>
 
@@ -1055,6 +1203,7 @@
         const dayPageScreen = document.getElementById('dayPageScreen');
         const addVillagesScreen = document.getElementById('addVillagesScreen');
         const weeksScheduleScreen = document.getElementById('weeksScheduleScreen');
+        const dayHistoryScreen = document.getElementById('dayHistoryScreen');
         const headerBar = document.getElementById('headerBar');
 
         const authForm = document.getElementById('authForm');
@@ -1091,11 +1240,19 @@
         const calendarMonthText = document.getElementById('calendarMonthText');
 
         const villageSelectSpinner = document.getElementById('villageSelectSpinner');
+        const tokenSearchInput = document.getElementById('tokenSearchInput');
         const addVillageLabel = document.getElementById('addVillageLabel');
         const newVillageInput = document.getElementById('newVillageInput');
         const btnAddVillage = document.getElementById('btnAddVillage');
         const currentVillagesList = document.getElementById('currentVillagesList');
         const villageTokensList = document.getElementById('villageTokensList');
+
+        // History DOM Elements
+        const historyDatePicker = document.getElementById('historyDatePicker');
+        const historyEntriesList = document.getElementById('historyEntriesList');
+        const histTotalPaid = document.getElementById('histTotalPaid');
+        const histTotalCash = document.getElementById('histTotalCash');
+        const histTotalUpi = document.getElementById('histTotalUpi');
 
         // Modals & Inputs
         const addTokenModal = document.getElementById('addTokenModal');
@@ -1104,6 +1261,9 @@
         const btnSubmitToken = document.getElementById('btnSubmitToken');
 
         const tokenNumInput = document.getElementById('tokenNumInput');
+        const tokenPersonNameInput = document.getElementById('tokenPersonNameInput');
+        const tokenNomineeNameInput = document.getElementById('tokenNomineeNameInput');
+        const tokenPhoneInput = document.getElementById('tokenPhoneInput');
         const tokenTotalMoneyInput = document.getElementById('tokenTotalMoneyInput');
         const tokenWeeklyMoneyInput = document.getElementById('tokenWeeklyMoneyInput');
         const tokenStartDateInput = document.getElementById('tokenStartDateInput');
@@ -1115,9 +1275,11 @@
 
         const payAmountInput = document.getElementById('payAmountInput');
         const payMethodSelect = document.getElementById('payMethodSelect');
+        const bothAmountGroup = document.getElementById('bothAmountGroup');
+        const payUpiAmountInput = document.getElementById('payUpiAmountInput');
+        const payCashAmountInput = document.getElementById('payCashAmountInput');
         const btnSubmitPayment = document.getElementById('btnSubmitPayment');
-        const btnClearSig = document.getElementById('btnClearSig');
-        const sigCanvas = document.getElementById('sigCanvas');
+        const btnEditPayment = document.getElementById('btnEditPayment');
 
         let activeDayKey = 'mon';
         let selectedAddDay = 'mon';
@@ -1125,53 +1287,62 @@
         let isInitialLoad = true;
         let activeTokenObj = null;
         let activeWeekIndex = -1;
+        let cachedTokens = [];
         let villagesListenerUnsub = null;
         let tokensListenerUnsub = null;
 
-        // Signature Canvas Logic
-        const ctx = sigCanvas.getContext('2d');
-        let isDrawing = false;
+        // HISTORY NAVIGATION & BACK BUTTON HANDLING
+        let currentScreenState = 'home';
 
-        function resizeCanvas() {
-            sigCanvas.width = sigCanvas.offsetWidth;
-            sigCanvas.height = sigCanvas.offsetHeight;
-            ctx.strokeStyle = "#005F73";
-            ctx.lineWidth = 3;
-            ctx.lineCap = "round";
+        function navigateToScreen(screenName, pushHistory = true) {
+            currentScreenState = screenName;
+            if (pushHistory) {
+                history.pushState({ screen: screenName }, '', `#${screenName}`);
+            }
+
+            hideAllScreens();
+            if (screenName !== 'auth' && screenName !== 'loading') {
+                headerBar.classList.remove('hidden');
+            }
+
+            if (screenName === 'home') {
+                userScreen.classList.remove('hidden');
+            } else if (screenName === 'dayPage') {
+                dayPageScreen.classList.remove('hidden');
+            } else if (screenName === 'addVillages') {
+                addVillagesScreen.classList.remove('hidden');
+            } else if (screenName === 'weeksSchedule') {
+                weeksScheduleScreen.classList.remove('hidden');
+            } else if (screenName === 'dayHistory') {
+                dayHistoryScreen.classList.remove('hidden');
+            }
         }
 
-        function startDrawing(e) {
-            isDrawing = true;
-            ctx.beginPath();
-            const pos = getPos(e);
-            ctx.moveTo(pos.x, pos.y);
-        }
+        window.addEventListener('popstate', (e) => {
+            // Close active overlays first if open
+            if (!paymentModal.classList.contains('hidden')) {
+                paymentModal.classList.add('hidden');
+                return;
+            }
+            if (!addTokenModal.classList.contains('hidden')) {
+                addTokenModal.classList.add('hidden');
+                return;
+            }
+            if (!profilePopover.classList.contains('hidden')) {
+                profilePopover.classList.add('hidden');
+                return;
+            }
+            if (sideDrawer.classList.contains('open')) {
+                closeDrawer();
+                return;
+            }
 
-        function draw(e) {
-            if (!isDrawing) return;
-            const pos = getPos(e);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-        }
-
-        function stopDrawing() { isDrawing = false; }
-
-        function getPos(e) {
-            const rect = sigCanvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
-        }
-
-        sigCanvas.addEventListener('mousedown', startDrawing);
-        sigCanvas.addEventListener('mousemove', draw);
-        sigCanvas.addEventListener('mouseup', stopDrawing);
-        sigCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
-        sigCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
-        sigCanvas.addEventListener('touchend', stopDrawing);
-
-        btnClearSig.addEventListener('click', () => {
-            ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+            const state = e.state;
+            if (state && state.screen) {
+                navigateToScreen(state.screen, false);
+            } else {
+                navigateToScreen('home', false);
+            }
         });
 
         // Drawer Navigation Logic
@@ -1200,13 +1371,12 @@
         // Day Navigation Page
         window.openDayPage = function(dayKey) {
             activeDayKey = dayKey;
-            hideAllScreens();
-            headerBar.classList.remove('hidden');
-            dayPageScreen.classList.remove('hidden');
-
+            tokenSearchInput.value = '';
+            
             const dayNames = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday' };
-            document.getElementById('dayPageHeaderTitle').innerText = `Select the Village (${dayNames[dayKey]})`;
+            document.getElementById('dayPageHeaderTitle').innerText = `Villages (${dayNames[dayKey]})`;
 
+            navigateToScreen('dayPage');
             loadVillagesSpinnerRealtime();
         };
 
@@ -1241,6 +1411,7 @@
         }
 
         villageSelectSpinner.addEventListener('change', renderVillageTokensRealtime);
+        tokenSearchInput.addEventListener('input', filterAndRenderTokens);
 
         // Realtime Listener for Tokens
         function renderVillageTokensRealtime() {
@@ -1255,28 +1426,168 @@
 
             const tokensRef = ref(db, `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`);
             tokensListenerUnsub = onValue(tokensRef, (snapshot) => {
-                villageTokensList.innerHTML = '';
-                const tokens = snapshot.exists() ? snapshot.val() : [];
+                cachedTokens = snapshot.exists() ? snapshot.val() : [];
+                filterAndRenderTokens();
+            });
+        }
 
-                if (Array.isArray(tokens)) {
-                    tokens.forEach((tok, index) => {
-                        const card = document.createElement('div');
-                        card.className = 'token-card';
-                        card.onclick = () => open12WeeksSchedule(tok, index);
-                        card.innerHTML = `
-                            <div class="token-info">
-                                <div class="token-number">Token: ${tok.tokenNum}</div>
-                                <div class="token-sub">Start Date: ${tok.startDate}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">₹${tok.totalMoney}</div>
-                                <div style="font-size: 12px; font-weight: 700; color: var(--slate-blue);">₹${tok.weeklyMoney}/wk</div>
-                            </div>
-                        `;
-                        villageTokensList.appendChild(card);
+        function filterAndRenderTokens() {
+            villageTokensList.innerHTML = '';
+            if (!Array.isArray(cachedTokens)) return;
+
+            const query = tokenSearchInput.value.trim().toLowerCase();
+
+            cachedTokens.forEach((tok, index) => {
+                const tokenNumStr = String(tok.tokenNum || '').toLowerCase();
+                const personNameStr = String(tok.personName || '').toLowerCase();
+
+                if (query && !tokenNumStr.includes(query) && !personNameStr.includes(query)) {
+                    return;
+                }
+
+                let totalPaid = 0;
+                if (tok.payments) {
+                    Object.values(tok.payments).forEach(p => {
+                        totalPaid += Number(p.amount || 0);
                     });
                 }
+
+                const card = document.createElement('div');
+                card.className = 'token-card';
+                card.onclick = () => open12WeeksSchedule(tok, index);
+                card.innerHTML = `
+                    <div class="token-info">
+                        <div class="token-number">Token: ${tok.tokenNum}</div>
+                        <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">${tok.personName || "Name N/A"}</div>
+                        <div class="token-sub">Nominee: ${tok.nomineeName || "N/A"} | Ph: ${tok.phone || "N/A"}</div>
+                        <div class="token-sub">Start: ${tok.startDate}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">₹${tok.totalMoney}</div>
+                        <div style="font-size: 12px; font-weight: 700; color: var(--slate-blue);">₹${tok.weeklyMoney}/wk</div>
+                        <div style="font-size: 11px; font-weight: 800; color: var(--green-paid); margin-top: 4px;">Paid: ₹${totalPaid}</div>
+                    </div>
+                `;
+                villageTokensList.appendChild(card);
             });
+        }
+
+        // HISTORY VIEW FOR DAY TAB (Mon / Tue / Wed)
+        window.openDayHistoryView = function() {
+            const dayNames = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday' };
+            document.getElementById('historyHeaderTitle').innerText = `${dayNames[activeDayKey]} History`;
+            
+            // Set default date to today YYYY-MM-DD
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            historyDatePicker.value = `${yyyy}-${mm}-${dd}`;
+
+            navigateToScreen('dayHistory');
+            loadDayHistoryRealtime();
+        };
+
+        historyDatePicker.addEventListener('change', loadDayHistoryRealtime);
+
+        async function loadDayHistoryRealtime() {
+            historyEntriesList.innerHTML = '';
+            histTotalPaid.innerText = '₹0';
+            histTotalCash.innerText = '₹0';
+            histTotalUpi.innerText = '₹0';
+
+            const userKey = getUserNodeKey();
+            const selectedDate = historyDatePicker.value; // format: YYYY-MM-DD
+            if (!userKey || !selectedDate) return;
+
+            try {
+                // Fetch all village tokens under activeDayKey
+                const snapshot = await get(child(ref(db), `users/${userKey}/tokens/${activeDayKey}`));
+                if (!snapshot.exists()) {
+                    historyEntriesList.innerHTML = '<div style="font-size:13px; color: var(--slate-blue); text-align:center; margin-top: 20px;">No transaction records found for this day.</div>';
+                    return;
+                }
+
+                const villagesData = snapshot.val();
+                let matchingPayments = [];
+                let dayTotal = 0;
+                let dayCash = 0;
+                let dayUpi = 0;
+
+                Object.keys(villagesData).forEach(vKey => {
+                    const tokenArray = villagesData[vKey];
+                    if (Array.isArray(tokenArray)) {
+                        tokenArray.forEach(tok => {
+                            if (tok.payments) {
+                                Object.keys(tok.payments).forEach(wIdx => {
+                                    const p = tok.payments[wIdx];
+                                    if (p.paidAt) {
+                                        const pDate = p.paidAt.split('T')[0]; // Extract YYYY-MM-DD
+                                        if (pDate === selectedDate) {
+                                            const amt = Number(p.amount || 0);
+                                            const upiAmt = p.method === 'Both' ? Number(p.upiAmount || 0) : (p.method === 'UPI' ? amt : 0);
+                                            const cashAmt = p.method === 'Both' ? Number(p.cashAmount || 0) : (p.method === 'Cash' ? amt : 0);
+
+                                            dayTotal += amt;
+                                            dayCash += cashAmt;
+                                            dayUpi += upiAmt;
+
+                                            matchingPayments.push({
+                                                tokenNum: tok.tokenNum,
+                                                personName: tok.personName,
+                                                village: tok.village,
+                                                weekNum: Number(wIdx) + 1,
+                                                amount: amt,
+                                                method: p.method,
+                                                cashAmt,
+                                                upiAmt,
+                                                paidAt: p.paidAt
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+                histTotalPaid.innerText = `₹${dayTotal}`;
+                histTotalCash.innerText = `₹${dayCash}`;
+                histTotalUpi.innerText = `₹${dayUpi}`;
+
+                if (matchingPayments.length === 0) {
+                    historyEntriesList.innerHTML = '<div style="font-size:13px; color: var(--slate-blue); text-align:center; margin-top: 20px;">No payments recorded on this date.</div>';
+                    return;
+                }
+
+                matchingPayments.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'history-card';
+                    
+                    let breakdownText = `Method: ${item.method}`;
+                    if (item.method === 'Both') {
+                        breakdownText += ` (Cash: ₹${item.cashAmt} | UPI: ₹${item.upiAmt})`;
+                    }
+
+                    const timeFormatted = new Date(item.paidAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    card.innerHTML = `
+                        <div class="history-card-header">
+                            <span>Token #${item.tokenNum} (${item.personName})</span>
+                            <span style="color: var(--green-paid);">₹${item.amount}</span>
+                        </div>
+                        <div class="history-card-sub">Village: ${item.village} | Week ${item.weekNum}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+                            <span class="history-card-badge">${breakdownText}</span>
+                            <span style="font-size: 11px; font-weight: 600; color: var(--slate-blue);">${timeFormatted}</span>
+                        </div>
+                    `;
+                    historyEntriesList.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("History fetch error:", err);
+            }
         }
 
         // Create Token Flow
@@ -1296,11 +1607,14 @@
         btnSubmitToken.addEventListener('click', async () => {
             const selectedVillage = villageSelectSpinner.value;
             const tokenNum = tokenNumInput.value.trim();
+            const personName = tokenPersonNameInput.value.trim();
+            const nomineeName = tokenNomineeNameInput.value.trim();
+            const phone = tokenPhoneInput.value.trim();
             const totalMoney = tokenTotalMoneyInput.value.trim();
             const weeklyMoney = tokenWeeklyMoneyInput.value.trim();
             const startDate = tokenStartDateInput.value;
 
-            if (!tokenNum || !totalMoney || !weeklyMoney || !startDate) {
+            if (!tokenNum || !personName || !nomineeName || !phone || !totalMoney || !weeklyMoney || !startDate) {
                 alert("Please fill in all token details.");
                 return;
             }
@@ -1314,6 +1628,9 @@
 
                 const newToken = {
                     tokenNum,
+                    personName,
+                    nomineeName,
+                    phone,
                     totalMoney,
                     weeklyMoney,
                     startDate,
@@ -1325,6 +1642,9 @@
                 await set(ref(db, `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`), tokens);
 
                 tokenNumInput.value = '';
+                tokenPersonNameInput.value = '';
+                tokenNomineeNameInput.value = '';
+                tokenPhoneInput.value = '';
                 tokenTotalMoneyInput.value = '';
                 tokenWeeklyMoneyInput.value = '';
                 tokenStartDateInput.value = '';
@@ -1338,20 +1658,35 @@
         // 12 Weeks Schedule Calculation & Display
         function open12WeeksSchedule(tok, tokIndex) {
             activeTokenObj = { ...tok, tokIndex };
-            hideAllScreens();
-            headerBar.classList.remove('hidden');
-            weeksScheduleScreen.classList.remove('hidden');
+            navigateToScreen('weeksSchedule');
 
             document.getElementById('scheduleTokenNum').innerText = `Token #${tok.tokenNum}`;
+            document.getElementById('schedulePersonName').innerText = `Name: ${tok.personName || "N/A"}`;
+            document.getElementById('scheduleNomineeName').innerText = `Nominee: ${tok.nomineeName || "N/A"} | Ph: ${tok.phone || "N/A"}`;
             document.getElementById('scheduleVillageName').innerText = `Village: ${tok.village}`;
             document.getElementById('scheduleTotalMoney').innerText = `Total: ₹${tok.totalMoney}`;
             document.getElementById('scheduleWeeklyMoney').innerText = `Weekly: ₹${tok.weeklyMoney}`;
+
+            // Calculate total paid so far and balance
+            let totalPaid = 0;
+            if (tok.payments) {
+                Object.values(tok.payments).forEach(p => {
+                    totalPaid += Number(p.amount || 0);
+                });
+            }
+
+            const totalGiven = Number(tok.totalMoney || 0);
+            const remainingBalance = Math.max(0, totalGiven - totalPaid);
+
+            document.getElementById('schedulePaidSoFar').innerText = `Paid: ₹${totalPaid}`;
+            document.getElementById('scheduleBalanceRemaining').innerText = `Remaining: ₹${remainingBalance}`;
 
             const container = document.getElementById('weeksListContainer');
             container.innerHTML = '';
 
             const start = new Date(tok.startDate);
             const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const expectedWeekly = Number(tok.weeklyMoney || 0);
 
             for (let i = 0; i < 12; i++) {
                 const currentWeekDate = new Date(start);
@@ -1363,30 +1698,51 @@
                 const dayName = daysOfWeek[currentWeekDate.getDay()];
                 const formattedDate = `${dStr}-${mStr}-${yStr} (${dayName})`;
 
-                const isPaid = tok.payments && tok.payments[i];
+                const paymentRecord = tok.payments && tok.payments[i];
+                const paidAmount = paymentRecord ? Number(paymentRecord.amount || 0) : 0;
+                const diff = paidAmount - expectedWeekly;
+
+                let statusBadgeHTML = `<div class="status-badge">Pay Now</div>`;
+                let cardClass = "week-item-card";
+
+                if (paymentRecord) {
+                    if (diff < 0) {
+                        cardClass = "week-item-card partial";
+                        statusBadgeHTML = `<div class="status-badge partial">Due: ${diff}</div>`;
+                    } else {
+                        cardClass = "week-item-card paid";
+                        statusBadgeHTML = `<div class="status-badge paid">Paid: ₹${paidAmount}</div>`;
+                    }
+                }
 
                 const card = document.createElement('div');
-                card.className = `week-item-card ${isPaid ? 'paid' : ''}`;
-                card.onclick = () => openPaymentModal(i, formattedDate, isPaid ? tok.payments[i] : null);
+                card.className = cardClass;
+                card.onclick = () => openPaymentModal(i, formattedDate, paymentRecord);
 
                 card.innerHTML = `
                     <div>
                         <div class="week-title">Week ${i + 1}</div>
                         <div class="week-date">${formattedDate}</div>
                     </div>
-                    <div class="status-badge ${isPaid ? 'paid' : ''}">${isPaid ? 'Already Paid' : 'Pay Now'}</div>
+                    ${statusBadgeHTML}
                 `;
                 container.appendChild(card);
             }
         }
 
         window.returnToDayPage = function() {
-            hideAllScreens();
-            headerBar.classList.remove('hidden');
-            dayPageScreen.classList.remove('hidden');
+            navigateToScreen('dayPage');
         };
 
-        // Payment & Signature Modal Logic
+        // Payment Modal Handling
+        payMethodSelect.addEventListener('change', () => {
+            if (payMethodSelect.value === "Both") {
+                bothAmountGroup.classList.remove('hidden');
+            } else {
+                bothAmountGroup.classList.add('hidden');
+            }
+        });
+
         function openPaymentModal(weekIdx, formattedDate, paidData) {
             activeWeekIndex = weekIdx;
             document.getElementById('paymentModalWeekTitle').innerText = `Week ${weekIdx + 1} Payment`;
@@ -1396,17 +1752,61 @@
                 paymentFormSection.classList.add('hidden');
                 paidDetailsSection.classList.remove('hidden');
 
-                document.getElementById('paidAmountText').innerText = `Amount Paid: ₹${paidData.amount}`;
-                document.getElementById('paidMethodText').innerText = `Method: ${paidData.method}`;
-                document.getElementById('paidSigImage').src = paidData.signature;
-            } else {
-                paymentFormSection.classList.remove('hidden');
-                paidDetailsSection.classList.add('hidden');
+                const expected = Number(activeTokenObj.weeklyMoney || 0);
+                const actual = Number(paidData.amount || 0);
+                const diff = actual - expected;
 
-                payAmountInput.value = activeTokenObj.weeklyMoney || '';
-                setTimeout(resizeCanvas, 100);
+                let statusText = "Full Paid";
+                if (diff < 0) {
+                    statusText = `Partial Paid (Due: ₹${Math.abs(diff)})`;
+                    document.getElementById('paidStatusHeader').style.color = "var(--red-logout)";
+                } else {
+                    document.getElementById('paidStatusHeader').style.color = "var(--green-paid)";
+                }
+
+                document.getElementById('paidStatusHeader').innerText = statusText;
+                document.getElementById('paidAmountText').innerText = `Total Amount: ₹${paidData.amount}`;
+                document.getElementById('paidMethodText').innerText = `Method: ${paidData.method}`;
+
+                let timeStr = "N/A";
+                if (paidData.paidAt) {
+                    const d = new Date(paidData.paidAt);
+                    timeStr = d.toLocaleString();
+                }
+                document.getElementById('paidTimestampText').innerText = `Submitted At: ${timeStr}`;
+
+                const breakdownEl = document.getElementById('paidBreakdownText');
+                if (paidData.method === "Both") {
+                    breakdownEl.classList.remove('hidden');
+                    breakdownEl.innerHTML = `UPI Amount: ₹${paidData.upiAmount || 0}<br>Cash Amount: ₹${paidData.cashAmount || 0}`;
+                } else {
+                    breakdownEl.classList.add('hidden');
+                }
+            } else {
+                showPaymentFormView();
             }
         }
+
+        function showPaymentFormView() {
+            paymentFormSection.classList.remove('hidden');
+            paidDetailsSection.classList.add('hidden');
+
+            const currentPayment = activeTokenObj.payments && activeTokenObj.payments[activeWeekIndex];
+            payAmountInput.value = currentPayment ? currentPayment.amount : activeTokenObj.weeklyMoney || '';
+            payMethodSelect.value = currentPayment ? currentPayment.method : "Cash";
+
+            if (payMethodSelect.value === "Both") {
+                bothAmountGroup.classList.remove('hidden');
+                payUpiAmountInput.value = currentPayment ? currentPayment.upiAmount || '' : '';
+                payCashAmountInput.value = currentPayment ? currentPayment.cashAmount || '' : '';
+            } else {
+                bothAmountGroup.classList.add('hidden');
+                payUpiAmountInput.value = '';
+                payCashAmountInput.value = '';
+            }
+        }
+
+        btnEditPayment.addEventListener('click', showPaymentFormView);
 
         btnClosePaymentModal.addEventListener('click', () => {
             paymentModal.classList.add('hidden');
@@ -1415,11 +1815,25 @@
         btnSubmitPayment.addEventListener('click', async () => {
             const amount = payAmountInput.value.trim();
             const method = payMethodSelect.value;
-            const sigData = sigCanvas.toDataURL();
+            let upiAmount = "";
+            let cashAmount = "";
 
             if (!amount) {
                 alert("Please enter given amount.");
                 return;
+            }
+
+            if (method === "Both") {
+                upiAmount = payUpiAmountInput.value.trim();
+                cashAmount = payCashAmountInput.value.trim();
+                if (!upiAmount || !cashAmount) {
+                    alert("Please enter both UPI and Cash amounts.");
+                    return;
+                }
+                if (Number(upiAmount) + Number(cashAmount) !== Number(amount)) {
+                    alert("Sum of UPI and Cash amounts must equal the Total Given Amount.");
+                    return;
+                }
             }
 
             const userKey = getUserNodeKey();
@@ -1437,7 +1851,8 @@
                 tokens[activeTokenObj.tokIndex].payments[activeWeekIndex] = {
                     amount,
                     method,
-                    signature: sigData,
+                    upiAmount: method === "Both" ? upiAmount : "",
+                    cashAmount: method === "Both" ? cashAmount : "",
                     paidAt: new Date().toISOString()
                 };
 
@@ -1452,9 +1867,7 @@
 
         // Add Villages View Functions
         function showAddVillagesScreen() {
-            hideAllScreens();
-            headerBar.classList.remove('hidden');
-            addVillagesScreen.classList.remove('hidden');
+            navigateToScreen('addVillages');
             selectAddVillageTab('mon');
         }
 
@@ -1512,9 +1925,7 @@
         }
 
         window.showDashboardHome = function() {
-            hideAllScreens();
-            headerBar.classList.remove('hidden');
-            userScreen.classList.remove('hidden');
+            navigateToScreen('home');
         };
 
         function hideAllScreens() {
@@ -1522,6 +1933,7 @@
             dayPageScreen.classList.add('hidden');
             addVillagesScreen.classList.add('hidden');
             weeksScheduleScreen.classList.add('hidden');
+            dayHistoryScreen.classList.add('hidden');
         }
 
         // Auth Logic & State Handlers
@@ -1628,8 +2040,8 @@
         async function showUserDashboard(user) {
             authScreen.classList.add('hidden');
             loadingScreen.classList.add('hidden');
-            headerBar.classList.remove('hidden');
-            userScreen.classList.remove('hidden');
+
+            navigateToScreen('home', false);
 
             const email = user.email || "";
             displayEmail.innerText = "Email: " + email;
