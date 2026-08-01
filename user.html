@@ -790,7 +790,7 @@
                 <div class="earth-globe"></div>
             </div>
             <div class="loading-text">Securing Your Session...</div>
-            <div class="loading-sub">Loading portfolio dashboard</div>
+            <div class="loading-sub">Syncing Realtime Cloud Data</div>
         </div>
 
         <!-- COMMON HEADER BAR COMPONENT -->
@@ -993,7 +993,7 @@
         </div>
     </div>
 
-    <!-- FIREBASE & JS SERVICES MODULE SCRIPT -->
+    <!-- FIREBASE SERVICES MODULE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -1004,12 +1004,20 @@
             signInWithEmailAndPassword, 
             createUserWithEmailAndPassword, 
             updatePassword, 
+            updateProfile,
             signOut, 
             onAuthStateChanged, 
             setPersistence, 
             browserLocalPersistence 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            get, 
+            child, 
+            onValue 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -1025,14 +1033,20 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
+        const db = getDatabase(app);
 
-        // Configure Local Storage persistence
+        // Configure Local Storage Persistence
         setPersistence(auth, browserLocalPersistence).catch((err) => console.log("Persistence setup err: " + err.message));
-
+        
         const googleProvider = new GoogleAuthProvider();
         googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+        // Utility to get user UID key
+        function getUserNodeKey() {
+            const u = auth.currentUser;
+            return u ? u.uid : null;
+        }
 
         // DOM Elements
         const authScreen = document.getElementById('authScreen');
@@ -1111,6 +1125,8 @@
         let isInitialLoad = true;
         let activeTokenObj = null;
         let activeWeekIndex = -1;
+        let villagesListenerUnsub = null;
+        let tokensListenerUnsub = null;
 
         // Signature Canvas Logic
         const ctx = sigCanvas.getContext('2d');
@@ -1138,24 +1154,18 @@
             ctx.stroke();
         }
 
-        function stopDrawing() {
-            isDrawing = false;
-        }
+        function stopDrawing() { isDrawing = false; }
 
         function getPos(e) {
             const rect = sigCanvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         sigCanvas.addEventListener('mousedown', startDrawing);
         sigCanvas.addEventListener('mousemove', draw);
         sigCanvas.addEventListener('mouseup', stopDrawing);
-
         sigCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
         sigCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
         sigCanvas.addEventListener('touchend', stopDrawing);
@@ -1197,60 +1207,75 @@
             const dayNames = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday' };
             document.getElementById('dayPageHeaderTitle').innerText = `Select the Village (${dayNames[dayKey]})`;
 
-            loadVillagesSpinner();
+            loadVillagesSpinnerRealtime();
         };
 
-        function loadVillagesSpinner() {
-            const currentUser = auth.currentUser;
-            const userEmail = currentUser ? currentUser.email : 'guest';
-            const storageKey = `villages_${userEmail}_${activeDayKey}`;
-            const villages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        // Realtime Listener for Villages Dropdown
+        function loadVillagesSpinnerRealtime() {
+            const userKey = getUserNodeKey();
+            if (!userKey) return;
 
-            villageSelectSpinner.innerHTML = '';
-            if (villages.length === 0) {
-                const opt = document.createElement('option');
-                opt.value = "";
-                opt.innerText = "No villages added";
-                villageSelectSpinner.appendChild(opt);
-                renderVillageTokens();
-            } else {
-                villages.forEach(v => {
+            if (villagesListenerUnsub) villagesListenerUnsub();
+
+            const villagesRef = ref(db, `users/${userKey}/villages/${activeDayKey}`);
+            villagesListenerUnsub = onValue(villagesRef, (snapshot) => {
+                const villages = snapshot.exists() ? snapshot.val() : [];
+                villageSelectSpinner.innerHTML = '';
+
+                if (!Array.isArray(villages) || villages.length === 0) {
                     const opt = document.createElement('option');
-                    opt.value = v;
-                    opt.innerText = v;
+                    opt.value = "";
+                    opt.innerText = "No villages added";
                     villageSelectSpinner.appendChild(opt);
-                });
-                renderVillageTokens();
-            }
+                    renderVillageTokensRealtime();
+                } else {
+                    villages.forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v;
+                        opt.innerText = v;
+                        villageSelectSpinner.appendChild(opt);
+                    });
+                    renderVillageTokensRealtime();
+                }
+            });
         }
 
-        villageSelectSpinner.addEventListener('change', renderVillageTokens);
+        villageSelectSpinner.addEventListener('change', renderVillageTokensRealtime);
 
-        function renderVillageTokens() {
+        // Realtime Listener for Tokens
+        function renderVillageTokensRealtime() {
             villageTokensList.innerHTML = '';
             const selectedVillage = villageSelectSpinner.value;
-            if (!selectedVillage) return;
+            const userKey = getUserNodeKey();
+            if (!selectedVillage || !userKey) return;
 
-            const currentUser = auth.currentUser;
-            const userEmail = currentUser ? currentUser.email : 'guest';
-            const tokenStorageKey = `tokens_${userEmail}_${activeDayKey}_${selectedVillage}`;
-            const tokens = JSON.parse(localStorage.getItem(tokenStorageKey) || '[]');
+            const safeVillageKey = selectedVillage.replace(/[.#$\[\]]/g, "_");
+            
+            if (tokensListenerUnsub) tokensListenerUnsub();
 
-            tokens.forEach((tok, index) => {
-                const card = document.createElement('div');
-                card.className = 'token-card';
-                card.onclick = () => open12WeeksSchedule(tok, index);
-                card.innerHTML = `
-                    <div class="token-info">
-                        <div class="token-number">Token: ${tok.tokenNum}</div>
-                        <div class="token-sub">Start Date: ${tok.startDate}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">₹${tok.totalMoney}</div>
-                        <div style="font-size: 12px; font-weight: 700; color: var(--slate-blue);">₹${tok.weeklyMoney}/wk</div>
-                    </div>
-                `;
-                villageTokensList.appendChild(card);
+            const tokensRef = ref(db, `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`);
+            tokensListenerUnsub = onValue(tokensRef, (snapshot) => {
+                villageTokensList.innerHTML = '';
+                const tokens = snapshot.exists() ? snapshot.val() : [];
+
+                if (Array.isArray(tokens)) {
+                    tokens.forEach((tok, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'token-card';
+                        card.onclick = () => open12WeeksSchedule(tok, index);
+                        card.innerHTML = `
+                            <div class="token-info">
+                                <div class="token-number">Token: ${tok.tokenNum}</div>
+                                <div class="token-sub">Start Date: ${tok.startDate}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">₹${tok.totalMoney}</div>
+                                <div style="font-size: 12px; font-weight: 700; color: var(--slate-blue);">₹${tok.weeklyMoney}/wk</div>
+                            </div>
+                        `;
+                        villageTokensList.appendChild(card);
+                    });
+                }
             });
         }
 
@@ -1268,7 +1293,7 @@
             addTokenModal.classList.add('hidden');
         });
 
-        btnSubmitToken.addEventListener('click', () => {
+        btnSubmitToken.addEventListener('click', async () => {
             const selectedVillage = villageSelectSpinner.value;
             const tokenNum = tokenNumInput.value.trim();
             const totalMoney = tokenTotalMoneyInput.value.trim();
@@ -1280,30 +1305,34 @@
                 return;
             }
 
-            const currentUser = auth.currentUser;
-            const userEmail = currentUser ? currentUser.email : 'guest';
-            const tokenStorageKey = `tokens_${userEmail}_${activeDayKey}_${selectedVillage}`;
-            const tokens = JSON.parse(localStorage.getItem(tokenStorageKey) || '[]');
+            const userKey = getUserNodeKey();
+            const safeVillageKey = selectedVillage.replace(/[.#$\[\]]/g, "_");
 
-            const newToken = {
-                tokenNum,
-                totalMoney,
-                weeklyMoney,
-                startDate,
-                village: selectedVillage,
-                payments: {} // Store payments indexed by week index (0-11)
-            };
+            try {
+                const snapshot = await get(child(ref(db), `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`));
+                const tokens = snapshot.exists() ? snapshot.val() : [];
 
-            tokens.push(newToken);
-            localStorage.setItem(tokenStorageKey, JSON.stringify(tokens));
+                const newToken = {
+                    tokenNum,
+                    totalMoney,
+                    weeklyMoney,
+                    startDate,
+                    village: selectedVillage,
+                    payments: {}
+                };
 
-            tokenNumInput.value = '';
-            tokenTotalMoneyInput.value = '';
-            tokenWeeklyMoneyInput.value = '';
-            tokenStartDateInput.value = '';
+                tokens.push(newToken);
+                await set(ref(db, `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`), tokens);
 
-            addTokenModal.classList.add('hidden');
-            renderVillageTokens();
+                tokenNumInput.value = '';
+                tokenTotalMoneyInput.value = '';
+                tokenWeeklyMoneyInput.value = '';
+                tokenStartDateInput.value = '';
+
+                addTokenModal.classList.add('hidden');
+            } catch (err) {
+                alert("Firebase write error: " + err.message);
+            }
         });
 
         // 12 Weeks Schedule Calculation & Display
@@ -1355,7 +1384,6 @@
             hideAllScreens();
             headerBar.classList.remove('hidden');
             dayPageScreen.classList.remove('hidden');
-            renderVillageTokens();
         };
 
         // Payment & Signature Modal Logic
@@ -1365,7 +1393,6 @@
             paymentModal.classList.remove('hidden');
 
             if (paidData) {
-                // Show Already Paid View
                 paymentFormSection.classList.add('hidden');
                 paidDetailsSection.classList.remove('hidden');
 
@@ -1373,7 +1400,6 @@
                 document.getElementById('paidMethodText').innerText = `Method: ${paidData.method}`;
                 document.getElementById('paidSigImage').src = paidData.signature;
             } else {
-                // Show Entry Form View
                 paymentFormSection.classList.remove('hidden');
                 paidDetailsSection.classList.add('hidden');
 
@@ -1386,7 +1412,7 @@
             paymentModal.classList.add('hidden');
         });
 
-        btnSubmitPayment.addEventListener('click', () => {
+        btnSubmitPayment.addEventListener('click', async () => {
             const amount = payAmountInput.value.trim();
             const method = payMethodSelect.value;
             const sigData = sigCanvas.toDataURL();
@@ -1396,28 +1422,32 @@
                 return;
             }
 
-            const currentUser = auth.currentUser;
-            const userEmail = currentUser ? currentUser.email : 'guest';
+            const userKey = getUserNodeKey();
             const selectedVillage = activeTokenObj.village;
-            const tokenStorageKey = `tokens_${userEmail}_${activeDayKey}_${selectedVillage}`;
-            const tokens = JSON.parse(localStorage.getItem(tokenStorageKey) || '[]');
+            const safeVillageKey = selectedVillage.replace(/[.#$\[\]]/g, "_");
 
-            if (!tokens[activeTokenObj.tokIndex].payments) {
-                tokens[activeTokenObj.tokIndex].payments = {};
+            try {
+                const snapshot = await get(child(ref(db), `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`));
+                const tokens = snapshot.exists() ? snapshot.val() : [];
+
+                if (!tokens[activeTokenObj.tokIndex].payments) {
+                    tokens[activeTokenObj.tokIndex].payments = {};
+                }
+
+                tokens[activeTokenObj.tokIndex].payments[activeWeekIndex] = {
+                    amount,
+                    method,
+                    signature: sigData,
+                    paidAt: new Date().toISOString()
+                };
+
+                await set(ref(db, `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`), tokens);
+
+                paymentModal.classList.add('hidden');
+                open12WeeksSchedule(tokens[activeTokenObj.tokIndex], activeTokenObj.tokIndex);
+            } catch (err) {
+                alert("Payment Save Error: " + err.message);
             }
-
-            tokens[activeTokenObj.tokIndex].payments[activeWeekIndex] = {
-                amount,
-                method,
-                signature: sigData,
-                paidAt: new Date().toISOString()
-            };
-
-            localStorage.setItem(tokenStorageKey, JSON.stringify(tokens));
-            paymentModal.classList.add('hidden');
-
-            // Refresh 12-week schedule list view
-            open12WeeksSchedule(tokens[activeTokenObj.tokIndex], activeTokenObj.tokIndex);
         });
 
         // Add Villages View Functions
@@ -1440,40 +1470,45 @@
 
             const dayNames = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday' };
             addVillageLabel.innerText = `Villages on ${dayNames[dayKey]}`;
-            renderCurrentVillages();
+            renderCurrentVillagesRealtime();
         };
 
-        btnAddVillage.addEventListener('click', () => {
+        btnAddVillage.addEventListener('click', async () => {
             const val = newVillageInput.value.trim();
             if (!val) {
                 alert("Please enter a village name.");
                 return;
             }
 
-            const currentUser = auth.currentUser;
-            const userEmail = currentUser ? currentUser.email : 'guest';
-            const storageKey = `villages_${userEmail}_${selectedAddDay}`;
+            const userKey = getUserNodeKey();
 
-            const villages = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            villages.push(val);
-            localStorage.setItem(storageKey, JSON.stringify(villages));
+            try {
+                const snapshot = await get(child(ref(db), `users/${userKey}/villages/${selectedAddDay}`));
+                const villages = snapshot.exists() ? snapshot.val() : [];
 
-            newVillageInput.value = '';
-            renderCurrentVillages();
-            alert(`Village "${val}" added successfully!`);
+                villages.push(val);
+                await set(ref(db, `users/${userKey}/villages/${selectedAddDay}`), villages);
+
+                newVillageInput.value = '';
+                alert(`Village "${val}" saved to cloud successfully!`);
+            } catch (err) {
+                alert("Firebase Write Error: " + err.message);
+            }
         });
 
-        function renderCurrentVillages() {
-            const currentUser = auth.currentUser;
-            const userEmail = currentUser ? currentUser.email : 'guest';
-            const storageKey = `villages_${userEmail}_${selectedAddDay}`;
-            const villages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        function renderCurrentVillagesRealtime() {
+            const userKey = getUserNodeKey();
+            if (!userKey) return;
 
-            if (villages.length === 0) {
-                currentVillagesList.innerText = "None";
-            } else {
-                currentVillagesList.innerText = villages.join(', ');
-            }
+            const villagesRef = ref(db, `users/${userKey}/villages/${selectedAddDay}`);
+            onValue(villagesRef, (snapshot) => {
+                const villages = snapshot.exists() ? snapshot.val() : [];
+                if (!Array.isArray(villages) || villages.length === 0) {
+                    currentVillagesList.innerText = "None";
+                } else {
+                    currentVillagesList.innerText = villages.join(', ');
+                }
+            });
         }
 
         window.showDashboardHome = function() {
@@ -1549,8 +1584,12 @@
                 }
 
                 createUserWithEmailAndPassword(auth, email, password)
-                    .then((userCredential) => {
-                        localStorage.setItem('name_' + email, name);
+                    .then(async (userCredential) => {
+                        await updateProfile(userCredential.user, { displayName: name });
+                        await set(ref(db, `users/${userCredential.user.uid}/profile`), {
+                            name: name,
+                            email: email
+                        });
                         runLoadingScreen(() => showUserDashboard(userCredential.user));
                     })
                     .catch((error) => alert("Sign Up Error: " + error.message));
@@ -1586,7 +1625,7 @@
             alert("Native Sign-In Cancelled/Error: " + errorMsg);
         };
 
-        function showUserDashboard(user) {
+        async function showUserDashboard(user) {
             authScreen.classList.add('hidden');
             loadingScreen.classList.add('hidden');
             headerBar.classList.remove('hidden');
@@ -1595,8 +1634,20 @@
             const email = user.email || "";
             displayEmail.innerText = "Email: " + email;
 
-            const savedName = localStorage.getItem('name_' + email) || user.displayName || "";
-            const savedPhone = localStorage.getItem('phone_' + email) || "";
+            const userKey = getUserNodeKey();
+            let savedName = user.displayName || "";
+            let savedPhone = "";
+
+            try {
+                const snapshot = await get(child(ref(db), `users/${userKey}/profile`));
+                if (snapshot.exists()) {
+                    const profData = snapshot.val();
+                    if (profData.name) savedName = profData.name;
+                    if (profData.phone) savedPhone = profData.phone;
+                }
+            } catch (err) {
+                console.error("Profile fetch err:", err);
+            }
 
             if (savedName) {
                 userAvatar.innerText = savedName.charAt(0).toUpperCase();
@@ -1626,7 +1677,6 @@
         function startLiveClockAndDate() {
             function updateTime() {
                 const now = new Date();
-
                 const day = String(now.getDate()).padStart(2, '0');
                 const month = String(now.getMonth() + 1).padStart(2, '0');
                 const year = now.getFullYear();
@@ -1689,12 +1739,13 @@
             }
         };
 
-        btnSaveGoogleSetup.addEventListener('click', () => {
+        btnSaveGoogleSetup.addEventListener('click', async () => {
             const user = auth.currentUser;
             if (!user) return;
 
             const name = setupNameInput.value.trim();
             const newPassword = setupPasswordInput.value.trim();
+            const userKey = getUserNodeKey();
 
             if (!name) {
                 alert("Please enter your name.");
@@ -1705,37 +1756,56 @@
                 return;
             }
 
-            localStorage.setItem('name_' + user.email, name);
-            welcomeTitle.innerText = name;
-            userName.value = name;
-            userAvatar.innerText = name.charAt(0).toUpperCase();
+            try {
+                await updateProfile(user, { displayName: name });
+                await updatePassword(user, newPassword);
 
-            updatePassword(user, newPassword)
-                .then(() => {
-                    alert("Account setup completed!");
-                    googleSetupBox.classList.add('hidden');
-                })
-                .catch((error) => alert("Setup error: " + error.message));
+                await set(ref(db, `users/${userKey}/profile`), {
+                    name: name,
+                    email: user.email || ""
+                });
+
+                welcomeTitle.innerText = name;
+                userName.value = name;
+                userAvatar.innerText = name.charAt(0).toUpperCase();
+
+                alert("Account setup completed!");
+                googleSetupBox.classList.add('hidden');
+            } catch (err) {
+                alert("Setup error: " + err.message);
+            }
         });
 
-        profileForm.addEventListener('submit', (e) => {
+        profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
             if (!user) return;
 
             const name = userName.value.trim();
             const phone = userPhone.value.trim();
+            const userKey = getUserNodeKey();
 
-            localStorage.setItem('name_' + user.email, name);
-            localStorage.setItem('phone_' + user.email, phone);
+            try {
+                if (name) {
+                    await updateProfile(user, { displayName: name });
+                }
 
-            if (name) {
-                welcomeTitle.innerText = name;
-                userAvatar.innerText = name.charAt(0).toUpperCase();
+                await set(ref(db, `users/${userKey}/profile`), {
+                    name: name || "",
+                    phone: phone || "",
+                    email: user.email || ""
+                });
+
+                if (name) {
+                    welcomeTitle.innerText = name;
+                    userAvatar.innerText = name.charAt(0).toUpperCase();
+                }
+
+                alert("Profile details saved successfully!");
+                profilePopover.classList.add('hidden');
+            } catch (err) {
+                alert("Error saving profile: " + err.message);
             }
-
-            alert("Profile details saved!");
-            profilePopover.classList.add('hidden');
         });
 
         btnLogout.addEventListener('click', () => {
