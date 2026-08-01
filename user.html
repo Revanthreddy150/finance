@@ -141,7 +141,7 @@
             background-color: var(--red-logout);
             color: var(--white);
             width: 100%;
-            margin-top: 24px;
+            margin-top: 14px;
         }
 
         .btn-secondary {
@@ -750,6 +750,7 @@
             color: var(--red-logout);
         }
 
+        /* Profile Popover & Header */
         .profile-popover {
             position: absolute;
             top: 80px;
@@ -761,6 +762,32 @@
             padding: 24px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
             z-index: 100;
+        }
+
+        .profile-popover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .popover-close-btn {
+            background: var(--cream-offwhite);
+            border: 1px solid var(--light-gray);
+            color: var(--dark-teal);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .popover-close-btn:hover {
+            background-color: var(--ice-blue);
         }
 
         .info-card {
@@ -810,12 +837,46 @@
             font-weight: 800;
         }
 
+        /* CUSTOM TOAST NOTIFICATION BANNER */
+        .toast-container {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: var(--dark-teal);
+            color: var(--white);
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(0, 95, 115, 0.3);
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+            max-width: 90vw;
+            text-align: center;
+        }
+
+        .toast-container.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
         .hidden {
             display: none !important;
         }
     </style>
 </head>
 <body>
+
+    <!-- CUSTOM TOAST BUBBLE -->
+    <div id="toastContainer" class="toast-container">
+        <span id="toastMsg">Notification Message</span>
+    </div>
 
     <!-- Slide-Out Menu Drawer -->
     <div id="drawerOverlay" class="drawer-overlay"></div>
@@ -889,11 +950,18 @@
 
         <!-- Profile Details Popover -->
         <div id="profilePopover" class="profile-popover hidden">
-            <h3 style="font-size: 18px; color: var(--dark-teal); margin-bottom: 4px;" id="welcomeTitle">User Profile</h3>
-            <p style="font-size: 12px; color: var(--slate-blue); margin-bottom: 12px;">Account Information</p>
+            <div class="profile-popover-header">
+                <div>
+                    <h3 style="font-size: 18px; color: var(--dark-teal);" id="welcomeTitle">User Profile</h3>
+                    <p style="font-size: 12px; color: var(--slate-blue); margin-top: 2px;">Account Information</p>
+                </div>
+                <button type="button" id="btnCloseProfileHeader" class="popover-close-btn" title="Close">✕</button>
+            </div>
+
             <div class="info-card">
                 <strong id="displayEmail">Email: user@example.com</strong>
             </div>
+            
             <div id="googleSetupBox" class="hidden" style="margin-bottom: 16px; border-bottom: 1px solid var(--light-gray); padding-bottom: 12px;">
                 <p style="font-size: 12px; font-weight: bold; color: var(--dark-teal); margin-bottom: 8px;">Complete Setup</p>
                 <div class="input-group">
@@ -904,6 +972,7 @@
                 </div>
                 <button type="button" id="btnSaveGoogleSetup" class="btn btn-filled" style="padding: 10px; font-size: 13px;">Save Setup</button>
             </div>
+            
             <form id="profileForm">
                 <div class="input-group">
                     <input type="text" id="userName" placeholder="Full Name">
@@ -913,6 +982,8 @@
                 </div>
                 <button type="submit" class="btn btn-filled" style="padding: 12px; font-size: 14px;">Save Details</button>
             </form>
+
+            <button type="button" id="btnCloseProfileBottom" class="btn btn-secondary" style="padding: 10px; font-size: 13px; margin-top: 10px;">Close Profile</button>
             <button type="button" id="btnLogout" class="btn btn-logout" style="padding: 12px; font-size: 14px;">Logout</button>
         </div>
 
@@ -1196,7 +1267,37 @@
             return u ? u.uid : null;
         }
 
+        // Helper to update last active timestamp for Admin tracking
+        async function recordUserActiveTime() {
+            const userKey = getUserNodeKey();
+            if (!userKey) return;
+            try {
+                await set(ref(db, `users/${userKey}/lastActiveTime`), new Date().toISOString());
+            } catch (err) {
+                console.error("Error updating active time:", err);
+            }
+        }
+
+        // Helper to update user location details for Admin tracking
+        async function recordUserLocation(locationText, lat = null, lng = null) {
+            const userKey = getUserNodeKey();
+            if (!userKey) return;
+            try {
+                await set(ref(db, `users/${userKey}/lastLocation`), {
+                    locationText: locationText || "Unknown",
+                    lat: lat,
+                    lng: lng,
+                    updatedAt: new Date().toISOString()
+                });
+            } catch (err) {
+                console.error("Error saving location:", err);
+            }
+        }
+
         // DOM Elements
+        const toastContainer = document.getElementById('toastContainer');
+        const toastMsg = document.getElementById('toastMsg');
+
         const authScreen = document.getElementById('authScreen');
         const loadingScreen = document.getElementById('loadingScreen');
         const userScreen = document.getElementById('userScreen');
@@ -1223,6 +1324,8 @@
 
         const userAvatar = document.getElementById('userAvatar');
         const profilePopover = document.getElementById('profilePopover');
+        const btnCloseProfileHeader = document.getElementById('btnCloseProfileHeader');
+        const btnCloseProfileBottom = document.getElementById('btnCloseProfileBottom');
         const displayEmail = document.getElementById('displayEmail');
         const userName = document.getElementById('userName');
         const userPhone = document.getElementById('userPhone');
@@ -1290,6 +1393,18 @@
         let cachedTokens = [];
         let villagesListenerUnsub = null;
         let tokensListenerUnsub = null;
+        let toastTimeout = null;
+
+        // CUSTOM TOAST NOTIFICATION FUNCTION
+        function showToast(message) {
+            toastMsg.innerText = message;
+            toastContainer.classList.add('show');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toastContainer.classList.remove('show');
+            }, 3500);
+        }
 
         // HISTORY NAVIGATION & BACK BUTTON HANDLING
         let currentScreenState = 'home';
@@ -1594,7 +1709,7 @@
         btnOpenAddTokenModal.addEventListener('click', () => {
             const selectedVillage = villageSelectSpinner.value;
             if (!selectedVillage || selectedVillage === "") {
-                alert("Please select or add a village first!");
+                showToast("Please select or add a village first!");
                 return;
             }
             addTokenModal.classList.remove('hidden');
@@ -1615,7 +1730,7 @@
             const startDate = tokenStartDateInput.value;
 
             if (!tokenNum || !personName || !nomineeName || !phone || !totalMoney || !weeklyMoney || !startDate) {
-                alert("Please fill in all token details.");
+                showToast("Please fill in all token details.");
                 return;
             }
 
@@ -1650,8 +1765,9 @@
                 tokenStartDateInput.value = '';
 
                 addTokenModal.classList.add('hidden');
+                showToast(`Token #${tokenNum} created successfully!`);
             } catch (err) {
-                alert("Firebase write error: " + err.message);
+                showToast("Firebase write error: " + err.message);
             }
         });
 
@@ -1819,7 +1935,7 @@
             let cashAmount = "";
 
             if (!amount) {
-                alert("Please enter given amount.");
+                showToast("Please enter given amount.");
                 return;
             }
 
@@ -1827,11 +1943,11 @@
                 upiAmount = payUpiAmountInput.value.trim();
                 cashAmount = payCashAmountInput.value.trim();
                 if (!upiAmount || !cashAmount) {
-                    alert("Please enter both UPI and Cash amounts.");
+                    showToast("Please enter both UPI and Cash amounts.");
                     return;
                 }
                 if (Number(upiAmount) + Number(cashAmount) !== Number(amount)) {
-                    alert("Sum of UPI and Cash amounts must equal the Total Given Amount.");
+                    showToast("Sum of UPI and Cash must equal Total Given Amount.");
                     return;
                 }
             }
@@ -1859,9 +1975,10 @@
                 await set(ref(db, `users/${userKey}/tokens/${activeDayKey}/${safeVillageKey}`), tokens);
 
                 paymentModal.classList.add('hidden');
+                showToast(`Payment of ₹${amount} recorded!`);
                 open12WeeksSchedule(tokens[activeTokenObj.tokIndex], activeTokenObj.tokIndex);
             } catch (err) {
-                alert("Payment Save Error: " + err.message);
+                showToast("Payment Save Error: " + err.message);
             }
         });
 
@@ -1886,10 +2003,11 @@
             renderCurrentVillagesRealtime();
         };
 
+        // CUSTOM VILLAGE ADDED CONFIRMATION TOAST
         btnAddVillage.addEventListener('click', async () => {
             const val = newVillageInput.value.trim();
             if (!val) {
-                alert("Please enter a village name.");
+                showToast("Please enter a village name.");
                 return;
             }
 
@@ -1903,9 +2021,9 @@
                 await set(ref(db, `users/${userKey}/villages/${selectedAddDay}`), villages);
 
                 newVillageInput.value = '';
-                alert(`Village "${val}" saved to cloud successfully!`);
+                showToast(`Village "${val}" added successfully!`);
             } catch (err) {
-                alert("Firebase Write Error: " + err.message);
+                showToast("Firebase Write Error: " + err.message);
             }
         });
 
@@ -1952,9 +2070,17 @@
             }
         });
 
+        // Profile Popover Toggle & Close Actions
         userAvatar.addEventListener('click', () => {
             profilePopover.classList.toggle('hidden');
         });
+
+        function closeProfilePopover() {
+            profilePopover.classList.add('hidden');
+        }
+
+        btnCloseProfileHeader.addEventListener('click', closeProfilePopover);
+        btnCloseProfileBottom.addEventListener('click', closeProfilePopover);
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -1991,7 +2117,7 @@
             if (isSignUpMode) {
                 const name = signUpName.value.trim();
                 if (!name) {
-                    alert("Please enter your Full Name.");
+                    showToast("Please enter your Full Name.");
                     return;
                 }
 
@@ -2002,15 +2128,17 @@
                             name: name,
                             email: email
                         });
+                        recordUserActiveTime();
                         runLoadingScreen(() => showUserDashboard(userCredential.user));
                     })
-                    .catch((error) => alert("Sign Up Error: " + error.message));
+                    .catch((error) => showToast("Sign Up Error: " + error.message));
             } else {
                 signInWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
+                        recordUserActiveTime();
                         runLoadingScreen(() => showUserDashboard(userCredential.user));
                     })
-                    .catch((error) => alert("Login Error: " + error.message));
+                    .catch((error) => showToast("Login Error: " + error.message));
             }
         });
 
@@ -2020,21 +2148,25 @@
             } else {
                 signInWithPopup(auth, googleProvider)
                     .then((result) => {
+                        recordUserActiveTime();
                         runLoadingScreen(() => showUserDashboard(result.user));
                     })
-                    .catch((error) => alert("Google Sign-In Error: " + error.message));
+                    .catch((error) => showToast("Google Sign-In Error: " + error.message));
             }
         });
 
         window.handleNativeGoogleSuccess = function(idToken) {
             const credential = GoogleAuthProvider.credential(idToken);
             signInWithCredential(auth, credential)
-                .then((result) => runLoadingScreen(() => showUserDashboard(result.user)))
-                .catch((error) => alert("Firebase Native Auth Error: " + error.message));
+                .then((result) => {
+                    recordUserActiveTime();
+                    runLoadingScreen(() => showUserDashboard(result.user));
+                })
+                .catch((error) => showToast("Firebase Native Auth Error: " + error.message));
         };
 
         window.handleNativeGoogleError = function(errorMsg) {
-            alert("Native Sign-In Cancelled/Error: " + errorMsg);
+            showToast("Native Sign-In Cancelled/Error: " + errorMsg);
         };
 
         async function showUserDashboard(user) {
@@ -2042,6 +2174,7 @@
             loadingScreen.classList.add('hidden');
 
             navigateToScreen('home', false);
+            recordUserActiveTime();
 
             const email = user.email || "";
             displayEmail.innerText = "Email: " + email;
@@ -2117,6 +2250,7 @@
                 const loc = window.AndroidBridge.getUserLocation();
                 if (loc) {
                     userLocationText.innerText = loc;
+                    recordUserLocation(loc);
                     return;
                 }
             }
@@ -2131,24 +2265,33 @@
                             .then(data => {
                                 const city = data.address.city || data.address.town || data.address.village || data.address.county || "Location Found";
                                 const state = data.address.state ? `, ${data.address.state}` : "";
-                                userLocationText.innerText = `${city}${state}`;
+                                const fullLoc = `${city}${state}`;
+                                userLocationText.innerText = fullLoc;
+                                recordUserLocation(fullLoc, lat, lon);
                             })
                             .catch(() => {
-                                userLocationText.innerText = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+                                const fallbackLoc = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+                                userLocationText.innerText = fallbackLoc;
+                                recordUserLocation(fallbackLoc, lat, lon);
                             });
                     },
-                    () => { userLocationText.innerText = "Location Permission Denied"; },
+                    () => { 
+                        userLocationText.innerText = "Location Permission Denied"; 
+                        recordUserLocation("Permission Denied");
+                    },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
             } else {
                 userLocationText.innerText = "Location Not Supported";
+                recordUserLocation("Not Supported");
             }
         }
 
-        window.updateNativeLocation = function(locationString) {
+        window.updateNativeLocation = function(locationString, lat = null, lng = null) {
             if (userLocationText) {
                 userLocationText.innerText = locationString;
             }
+            recordUserLocation(locationString, lat, lng);
         };
 
         btnSaveGoogleSetup.addEventListener('click', async () => {
@@ -2160,11 +2303,11 @@
             const userKey = getUserNodeKey();
 
             if (!name) {
-                alert("Please enter your name.");
+                showToast("Please enter your name.");
                 return;
             }
             if (newPassword.length < 6) {
-                alert("Password must be at least 6 characters.");
+                showToast("Password must be at least 6 characters.");
                 return;
             }
 
@@ -2181,13 +2324,14 @@
                 userName.value = name;
                 userAvatar.innerText = name.charAt(0).toUpperCase();
 
-                alert("Account setup completed!");
+                showToast("Account setup completed!");
                 googleSetupBox.classList.add('hidden');
             } catch (err) {
-                alert("Setup error: " + err.message);
+                showToast("Setup error: " + err.message);
             }
         });
 
+        // CUSTOM TOAST FOR PROFILE UPDATES
         profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
@@ -2213,17 +2357,17 @@
                     userAvatar.innerText = name.charAt(0).toUpperCase();
                 }
 
-                alert("Profile details saved successfully!");
-                profilePopover.classList.add('hidden');
+                showToast("Profile details updated successfully!");
+                closeProfilePopover();
             } catch (err) {
-                alert("Error saving profile: " + err.message);
+                showToast("Error saving profile: " + err.message);
             }
         });
 
         btnLogout.addEventListener('click', () => {
             signOut(auth).then(() => {
                 authForm.reset();
-                profilePopover.classList.add('hidden');
+                closeProfilePopover();
             });
         });
     </script>
