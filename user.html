@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAVEEN FINANCE</title>
+    <style>
+        :root {
+            --dark-teal: #005F73;
+            --slate-blue: #4A6B82;
+            --ice-blue: #E0F2FE;
+            --white: #FFFFFF;
+            --cream-offwhite: #FDFBF7;
+            --light-gray: #E5E7EB;
+            --shadow-gray: rgba(0, 0, 0, 0.08);
+            --red-logout: #DC2626;
+            --green-paid: #16A34A;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--white);
+            min-height: 100vh;
+            width: 100vw;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Full Screen Container */
+        .fullscreen-container {
+            width: 100vw;
+            min-height: 100vh;
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Brand Image */
+        .top-brand-img {
+            max-width: 220px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto 16px auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* Form Wrapper */
+        .form-wrapper {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        /* Titles */
+        .title-group {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .title-group h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .title-group p {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--slate-blue);
+            letter-spacing: 0.15em;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+
+        /* Inputs & Select Elements */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid var(--light-gray);
+            border-radius: 30px;
+            font-size: 15px;
+            outline: none;
+            background-color: var(--cream-offwhite);
+            transition: all 0.2s ease;
+            color: var(--dark-teal);
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--dark-teal);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(0, 95, 115, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-filled {
+            background-color: var(--dark-teal);
+            color: var(--white);
+        }
+
+        .btn-filled:hover {
+            opacity: 0.95;
+        }
+
+        .btn-logout {
+            background-color: var(--red-logout);
+            color: var(--white);
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        /* Toggle Mode Link */
+        .toggle-mode-text {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--slate-blue);
+        }
+
+        .toggle-mode-text span {
+            color: var(--dark-teal);
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Social Section */
+        .social-section {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        .social-section p {
+            font-size: 12px;
+            color: var(--slate-blue);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+        }
+
+        .social-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid var(--light-gray);
+            box-shadow: 0 4px 12px var(--shadow-gray);
+            transition: transform 0.2s;
+            background-color: var(--white);
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 3D Earth Globe Spinner */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .globe-container {
+            width: 110px;
+            height: 110px;
+            position: relative;
+            perspective: 400px;
+            margin-bottom: 24px;
+        }
+
+        .earth-globe {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #00829B, var(--dark-teal));
+            position: relative;
+            box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.4), 0 0 25px rgba(0, 95, 115, 0.4);
+            overflow: hidden;
+            animation: rotateGlobe 5s infinite linear;
+        }
+
+        .earth-globe::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            border: 2px dashed rgba(224, 242, 254, 0.6);
+            transform: rotateX(65deg) rotateY(15deg);
+        }
+
+        .earth-globe::after {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 50%;
+            border-radius: 50%;
+            border: 2px dashed rgba(224, 242, 254, 0.4);
+            transform: rotateX(65deg) rotateY(-35deg);
+        }
+
+        @keyframes rotateGlobe {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            letter-spacing: 0.05em;
+        }
+
+        .loading-sub {
+            font-size: 14px;
+            color: var(--slate-blue);
+            margin-top: 6px;
+        }
+
+        /* Dashboard & Navigation Layouts */
+        .dashboard-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Header Bar Component */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .header-app-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--dark-teal);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .drawer-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: var(--cream-offwhite);
+            border: 1px solid var(--light-gray);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px var(--shadow-gray);
+            transition: background-color 0.2s;
+        }
+
+        .drawer-icon:hover {
+            background-color: var(--ice-blue);
+        }
+
+        .drawer-icon span {
+            width: 20px;
+            height: 2px;
+            background-color: var(--dark-teal);
+            border-radius: 2px;
+        }
+
+        .avatar-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--dark-teal);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px var(--shadow-gray);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .avatar-circle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Slide-Out Navigation Drawer */
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: var(--white);
+            border-right: 1px solid var(--light-gray);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            z-index: 200;
+            transition: left 0.3s ease;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .side-drawer.open {
+            left: 0;
+        }
+
+        .drawer-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            margin-bottom: 10px;
+        }
+
+        .drawer-menu-item {
+            padding: 14px 18px;
+            border-radius: 14px;
+            background-color: var(--cream-offwhite);
+            color: var(--dark-teal);
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--light-gray);
+        }
+
+        .drawer-menu-item:hover {
+            background-color: var(--ice-blue);
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.3);
+            z-index: 150;
+            display: none;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+        }
+
+        /* Info Widget Card */
+        .info-widget-card {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            background-color: var(--cream-offwhite);
+            border: 2px solid var(--dark-teal);
+            border-radius: 20px;
+            padding: 18px 20px;
+            box-shadow: 0 8px 20px var(--shadow-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .widget-left-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .location-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--dark-teal);
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .location-icon {
+            width: 20px;
+            height: 20px;
+            fill: var(--dark-teal);
+            flex-shrink: 0;
+        }
+
+        .date-day-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            letter-spacing: 0.02em;
+        }
+
+        .live-time-text {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--slate-blue);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .calendar-badge {
+            width: 75px;
+            height: 75px;
+            border: 3px solid var(--dark-teal);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        .calendar-top-bar {
+            background-color: var(--dark-teal);
+            height: 22px;
+            width: 100%;
+        }
+
+        .calendar-month-text {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--dark-teal);
+            text-transform: lowercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Progress / Work Section */
+        .work-section {
+            width: 100%;
+            max-width: 420px;
+            margin: 10px auto 0 auto;
+        }
+
+        .work-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .day-tabs-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .day-tab-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 20px;
+            border: 2px solid var(--dark-teal);
+            background-color: var(--white);
+            color: var(--dark-teal);
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-tab-btn:hover, .day-tab-btn.active {
+            background-color: var(--dark-teal);
+            color: var(--white);
+        }
+
+        /* Page Layout Styles */
+        .page-content-wrapper {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-bottom: 80px;
+        }
+
+        .page-section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            margin-top: 10px;
+        }
+
+        .village-spinner {
+            width: 100%;
+            padding: 16px;
+            border-radius: 30px;
+            border: 2px solid var(--dark-teal);
+            background-color: var(--cream-offwhite);
+            color: var(--dark-teal);
+            font-size: 15px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        /* Floating Action Button (+) */
+        .fab-add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--dark-teal);
+            color: var(--white);
+            font-size: 32px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            z-index: 90;
+            transition: transform 0.2s ease;
+        }
+
+        .fab-add-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Token List Cards */
+        .token-card {
+            background-color: var(--cream-offwhite);
+            border: 2px solid var(--dark-teal);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px var(--shadow-gray);
+            transition: transform 0.1s ease;
+        }
+
+        .token-card:active {
+            transform: scale(0.98);
+        }
+
+        .token-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .token-number {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--dark-teal);
+        }
+
+        .token-sub {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-blue);
+        }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 380px;
+            background-color: var(--white);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark-teal);
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        /* Signature Canvas Pad */
+        .signature-canvas {
+            width: 100%;
+            height: 160px;
+            border: 2px dashed var(--dark-teal);
+            border-radius: 16px;
+            background-color: var(--white);
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        /* 12-Weeks Item Cards */
+        .week-item-card {
+            background-color: var(--cream-offwhite);
+            border: 1.5px solid var(--light-gray);
+            border-radius: 16px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .week-item-card.paid {
+            border-color: var(--green-paid);
+            background-color: #F0FDF4;
+        }
+
+        .week-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--dark-teal);
+        }
+
+        .week-date {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-blue);
+        }
+
+        .status-badge {
+            font-size: 12px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background-color: var(--ice-blue);
+            color: var(--dark-teal);
+        }
+
+        .status-badge.paid {
+            background-color: #DCFCE7;
+            color: var(--green-paid);
+        }
+
+        .profile-popover {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 320px;
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            z-index: 100;
+        }
+
+        .info-card {
+            background-color: var(--cream-offwhite);
+            border: 1px solid var(--light-gray);
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--dark-teal);
+            word-break: break-all;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide-Out Menu Drawer -->
+    <div id="drawerOverlay" class="drawer-overlay"></div>
+    <div id="sideDrawer" class="side-drawer">
+        <div class="drawer-title">Navigation Menu</div>
+        <div id="btnNavHome" class="drawer-menu-item">Dashboard Home</div>
+        <div id="btnNavAddVillages" class="drawer-menu-item">Add Villages</div>
+    </div>
+
+    <div class="fullscreen-container">
+
+        <!-- 1. AUTH SCREEN (LOGIN / SIGNUP) -->
+        <div id="authScreen" class="form-wrapper" style="text-align: center;">
+            <img src="https://file.garden/abrK4_rpWxJegn7w/full%20nr.png" alt="Logo" class="top-brand-img">
+            <div class="title-group">
+                <h1 id="authTitle">NAVEEN FINANCE</h1>
+                <p>SMART PORTFOLIO &amp; WEALTH MANAGEMENT</p>
+            </div>
+
+            <form id="authForm">
+                <div class="input-group hidden" id="nameInputGroup">
+                    <input type="text" id="signUpName" placeholder="Full Name">
+                </div>
+                <div class="input-group">
+                    <input type="email" id="loginEmail" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit" id="btnSubmitAuth" class="btn btn-filled">Login</button>
+            </form>
+
+            <div class="toggle-mode-text">
+                <span id="toggleText">Don't have an account? Sign Up</span>
+            </div>
+
+            <div class="social-section">
+                <p>Or via Google</p>
+                <div class="social-icons">
+                    <button type="button" id="btnGoogleLogin" class="social-btn" title="Sign in with Google">
+                        <svg width="24" height="24" viewBox="0 0 18 18">
+                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                            <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 5-SECOND LOADING SCREEN -->
+        <div id="loadingScreen" class="loading-container hidden">
+            <div class="globe-container">
+                <div class="earth-globe"></div>
+            </div>
+            <div class="loading-text">Securing Your Session...</div>
+            <div class="loading-sub">Loading portfolio dashboard</div>
+        </div>
+
+        <!-- COMMON HEADER BAR COMPONENT -->
+        <div id="headerBar" class="dashboard-header hidden" style="position: absolute; top: 20px; left: 20px; right: 20px; width: auto; z-index: 50;">
+            <div class="drawer-icon" id="btnOpenDrawer" title="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="header-app-title">NAVEEN FINANCE</div>
+            <div id="userAvatar" class="avatar-circle" title="View Profile">U</div>
+        </div>
+
+        <!-- Profile Details Popover -->
+        <div id="profilePopover" class="profile-popover hidden">
+            <h3 style="font-size: 18px; color: var(--dark-teal); margin-bottom: 4px;" id="welcomeTitle">User Profile</h3>
+            <p style="font-size: 12px; color: var(--slate-blue); margin-bottom: 12px;">Account Information</p>
+            <div class="info-card">
+                <strong id="displayEmail">Email: user@example.com</strong>
+            </div>
+            <div id="googleSetupBox" class="hidden" style="margin-bottom: 16px; border-bottom: 1px solid var(--light-gray); padding-bottom: 12px;">
+                <p style="font-size: 12px; font-weight: bold; color: var(--dark-teal); margin-bottom: 8px;">Complete Setup</p>
+                <div class="input-group">
+                    <input type="text" id="setupName" placeholder="Set Your Name">
+                </div>
+                <div class="input-group">
+                    <input type="password" id="setupPassword" placeholder="Set Account Password">
+                </div>
+                <button type="button" id="btnSaveGoogleSetup" class="btn btn-filled" style="padding: 10px; font-size: 13px;">Save Setup</button>
+            </div>
+            <form id="profileForm">
+                <div class="input-group">
+                    <input type="text" id="userName" placeholder="Full Name">
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="userPhone" placeholder="Phone Number">
+                </div>
+                <button type="submit" class="btn btn-filled" style="padding: 12px; font-size: 14px;">Save Details</button>
+            </form>
+            <button type="button" id="btnLogout" class="btn btn-logout" style="padding: 12px; font-size: 14px;">Logout</button>
+        </div>
+
+        <!-- 3. DASHBOARD MAIN SCREEN -->
+        <div id="userScreen" class="dashboard-container hidden" style="padding-top: 100px;">
+            <div class="info-widget-card">
+                <div class="widget-left-content">
+                    <div class="location-container">
+                        <svg class="location-icon" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        <span id="userLocationText">Detecting...</span>
+                    </div>
+                    <div class="date-day-text" id="dateDayText">Loading Date...</div>
+                    <div class="live-time-text" id="liveClockText">00:00:00 AM</div>
+                </div>
+
+                <div class="calendar-badge">
+                    <div class="calendar-top-bar"></div>
+                    <div class="calendar-month-text" id="calendarMonthText">jan</div>
+                </div>
+            </div>
+
+            <!-- Your Progress / Work Section -->
+            <div class="work-section">
+                <div class="work-title">Your Progress / Work</div>
+                <div class="day-tabs-container">
+                    <button class="day-tab-btn" onclick="openDayPage('mon')">Mon</button>
+                    <button class="day-tab-btn" onclick="openDayPage('tue')">Tue</button>
+                    <button class="day-tab-btn" onclick="openDayPage('wed')">Wed</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. DAY PAGE (Mon / Tue / Wed View) -->
+        <div id="dayPageScreen" class="dashboard-container hidden" style="padding-top: 100px;">
+            <div class="page-content-wrapper">
+                <div class="page-section-title" id="dayPageHeaderTitle">Select the Village</div>
+                <select id="villageSelectSpinner" class="village-spinner">
+                    <option value="">No villages added</option>
+                </select>
+
+                <!-- Tokens List Container -->
+                <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;" id="villageTokensList">
+                    <!-- Dynamic Token Cards Render Here -->
+                </div>
+
+                <button class="btn btn-filled" onclick="showDashboardHome()" style="margin-top: 20px; background-color: var(--slate-blue);">Back to Home</button>
+            </div>
+
+            <!-- Floating Plus Action Button (+) -->
+            <div class="fab-add-btn" id="btnOpenAddTokenModal">+</div>
+        </div>
+
+        <!-- 5. ADD VILLAGES SCREEN -->
+        <div id="addVillagesScreen" class="dashboard-container hidden" style="padding-top: 100px;">
+            <div class="page-content-wrapper">
+                <div class="day-tabs-container">
+                    <button id="addTabMon" class="day-tab-btn active" onclick="selectAddVillageTab('mon')">Mon</button>
+                    <button id="addTabTue" class="day-tab-btn" onclick="selectAddVillageTab('tue')">Tue</button>
+                    <button id="addTabWed" class="day-tab-btn" onclick="selectAddVillageTab('wed')">Wed</button>
+                </div>
+
+                <div class="page-section-title" id="addVillageLabel">Villages on Monday</div>
+                
+                <div class="input-group">
+                    <input type="text" id="newVillageInput" placeholder="Enter village name">
+                </div>
+
+                <button type="button" id="btnAddVillage" class="btn btn-filled">Add Village</button>
+                
+                <div style="margin-top: 15px;">
+                    <div style="font-weight: 800; color: var(--dark-teal); font-size: 14px; margin-bottom: 8px;">Current Villages:</div>
+                    <div id="currentVillagesList" style="font-size: 13px; color: var(--slate-blue);">None</div>
+                </div>
+
+                <button class="btn btn-filled" onclick="showDashboardHome()" style="margin-top: 20px; background-color: var(--slate-blue);">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- 6. 12-WEEKS SCHEDULE SCREEN -->
+        <div id="weeksScheduleScreen" class="dashboard-container hidden" style="padding-top: 100px;">
+            <div class="page-content-wrapper">
+                <div style="background-color: var(--cream-offwhite); border: 2px solid var(--dark-teal); border-radius: 20px; padding: 16px;">
+                    <div style="font-size: 18px; font-weight: 900; color: var(--dark-teal);" id="scheduleTokenNum">Token #---</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--slate-blue); margin-top: 4px;" id="scheduleVillageName">Village: ---</div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 13px; font-weight: 800; color: var(--dark-teal);">
+                        <span id="scheduleTotalMoney">Total: ₹0</span>
+                        <span id="scheduleWeeklyMoney">Weekly: ₹0</span>
+                    </div>
+                </div>
+
+                <div class="page-section-title">12 Weeks Payment Schedule</div>
+
+                <div id="weeksListContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- 12 Weeks Entries render here dynamically -->
+                </div>
+
+                <button class="btn btn-filled" onclick="returnToDayPage()" style="margin-top: 15px; background-color: var(--slate-blue);">Back</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL: ADD TOKEN ENTRY -->
+    <div id="addTokenModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-title">Create Token Record</div>
+            <div class="input-group">
+                <input type="text" id="tokenNumInput" placeholder="Token Number (e.g. T-101)">
+            </div>
+            <div class="input-group">
+                <input type="number" id="tokenTotalMoneyInput" placeholder="Total Money (₹)">
+            </div>
+            <div class="input-group">
+                <input type="number" id="tokenWeeklyMoneyInput" placeholder="Weekly Money (₹)">
+            </div>
+            <div class="input-group">
+                <input type="date" id="tokenStartDateInput">
+            </div>
+            <button type="button" id="btnSubmitToken" class="btn btn-filled">Submit Entry</button>
+            <button type="button" id="btnCloseTokenModal" class="btn btn-filled" style="background-color: var(--slate-blue); margin-top: 0;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- MODAL: PAYMENT & SIGNATURE FORM -->
+    <div id="paymentModal" class="modal-overlay hidden">
+        <div class="modal-box" style="max-width: 400px;">
+            <div class="modal-title" id="paymentModalWeekTitle">Week Payment</div>
+            
+            <div id="paymentFormSection">
+                <div class="input-group">
+                    <input type="number" id="payAmountInput" placeholder="Given Amount (₹)">
+                </div>
+                <div class="input-group">
+                    <select id="payMethodSelect">
+                        <option value="UPI">UPI</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                </div>
+
+                <div style="font-size: 13px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Customer Signature:</div>
+                <canvas id="sigCanvas" class="signature-canvas"></canvas>
+                <div style="display: flex; gap: 10px; margin-top: 6px;">
+                    <button type="button" id="btnClearSig" class="btn btn-filled" style="padding: 8px; font-size: 12px; background-color: var(--slate-blue);">Clear Signature</button>
+                </div>
+
+                <button type="button" id="btnSubmitPayment" class="btn btn-filled" style="margin-top: 14px;">Confirm & Submit</button>
+            </div>
+
+            <!-- Already Paid View -->
+            <div id="paidDetailsSection" class="hidden" style="text-align: center;">
+                <div style="font-size: 16px; font-weight: 900; color: var(--green-paid); margin-bottom: 10px;">Already Paid</div>
+                <div id="paidAmountText" style="font-size: 14px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Amount Paid: ₹0</div>
+                <div id="paidMethodText" style="font-size: 13px; font-weight: 700; color: var(--slate-blue); margin-bottom: 12px;">Method: ---</div>
+                <div style="font-size: 12px; font-weight: 800; color: var(--dark-teal); margin-bottom: 6px;">Recorded Signature:</div>
+                <img id="paidSigImage" src="" alt="Signature" style="max-width: 100%; border: 1px solid var(--light-gray); border-radius: 12px; background: white; padding: 4px;">
+            </div>
+
+            <button type="button" id="btnClosePaymentModal" class="btn btn-filled" style="background-color: var(--slate-blue); margin-top: 10px;">Close</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE & JS SERVICES MODULE SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            signInWithCredential, 
+            GoogleAuthProvider, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            updatePassword, 
+            signOut, 
+            onAuthStateChanged, 
+            setPersistence, 
+            browserLocalPersistence 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKbbbmhhJ15LDACmQfE-7gQebx32YMYgc",
+            authDomain: "jthacks-bcf0b.firebaseapp.com",
+            databaseURL: "https://jthacks-bcf0b-default-rtdb.firebaseio.com",
+            projectId: "jthacks-bcf0b",
+            storageBucket: "jthacks-bcf0b.firebasestorage.app",
+            messagingSenderId: "786755260274",
+            appId: "1:786755260274:web:ae8d94443cb66efd69d7eb",
+            measurementId: "G-2YDM7L57FL"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        // Configure Local Storage persistence
+        setPersistence(auth, browserLocalPersistence).catch((err) => console.log("Persistence setup err: " + err.message));
+
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+        // DOM Elements
+        const authScreen = document.getElementById('authScreen');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const userScreen = document.getElementById('userScreen');
+        const dayPageScreen = document.getElementById('dayPageScreen');
+        const addVillagesScreen = document.getElementById('addVillagesScreen');
+        const weeksScheduleScreen = document.getElementById('weeksScheduleScreen');
+        const headerBar = document.getElementById('headerBar');
+
+        const authForm = document.getElementById('authForm');
+        const nameInputGroup = document.getElementById('nameInputGroup');
+        const signUpName = document.getElementById('signUpName');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const btnSubmitAuth = document.getElementById('btnSubmitAuth');
+        const toggleText = document.getElementById('toggleText');
+        const btnGoogleLogin = document.getElementById('btnGoogleLogin');
+
+        const sideDrawer = document.getElementById('sideDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const btnOpenDrawer = document.getElementById('btnOpenDrawer');
+        const btnNavHome = document.getElementById('btnNavHome');
+        const btnNavAddVillages = document.getElementById('btnNavAddVillages');
+
+        const userAvatar = document.getElementById('userAvatar');
+        const profilePopover = document.getElementById('profilePopover');
+        const displayEmail = document.getElementById('displayEmail');
+        const userName = document.getElementById('userName');
+        const userPhone = document.getElementById('userPhone');
+        const welcomeTitle = document.getElementById('welcomeTitle');
+        const profileForm = document.getElementById('profileForm');
+        const googleSetupBox = document.getElementById('googleSetupBox');
+        const setupNameInput = document.getElementById('setupName');
+        const setupPasswordInput = document.getElementById('setupPassword');
+        const btnSaveGoogleSetup = document.getElementById('btnSaveGoogleSetup');
+        const btnLogout = document.getElementById('btnLogout');
+
+        const userLocationText = document.getElementById('userLocationText');
+        const dateDayText = document.getElementById('dateDayText');
+        const liveClockText = document.getElementById('liveClockText');
+        const calendarMonthText = document.getElementById('calendarMonthText');
+
+        const villageSelectSpinner = document.getElementById('villageSelectSpinner');
+        const addVillageLabel = document.getElementById('addVillageLabel');
+        const newVillageInput = document.getElementById('newVillageInput');
+        const btnAddVillage = document.getElementById('btnAddVillage');
+        const currentVillagesList = document.getElementById('currentVillagesList');
+        const villageTokensList = document.getElementById('villageTokensList');
+
+        // Modals & Inputs
+        const addTokenModal = document.getElementById('addTokenModal');
+        const btnOpenAddTokenModal = document.getElementById('btnOpenAddTokenModal');
+        const btnCloseTokenModal = document.getElementById('btnCloseTokenModal');
+        const btnSubmitToken = document.getElementById('btnSubmitToken');
+
+        const tokenNumInput = document.getElementById('tokenNumInput');
+        const tokenTotalMoneyInput = document.getElementById('tokenTotalMoneyInput');
+        const tokenWeeklyMoneyInput = document.getElementById('tokenWeeklyMoneyInput');
+        const tokenStartDateInput = document.getElementById('tokenStartDateInput');
+
+        const paymentModal = document.getElementById('paymentModal');
+        const btnClosePaymentModal = document.getElementById('btnClosePaymentModal');
+        const paymentFormSection = document.getElementById('paymentFormSection');
+        const paidDetailsSection = document.getElementById('paidDetailsSection');
+
+        const payAmountInput = document.getElementById('payAmountInput');
+        const payMethodSelect = document.getElementById('payMethodSelect');
+        const btnSubmitPayment = document.getElementById('btnSubmitPayment');
+        const btnClearSig = document.getElementById('btnClearSig');
+        const sigCanvas = document.getElementById('sigCanvas');
+
+        let activeDayKey = 'mon';
+        let selectedAddDay = 'mon';
+        let isSignUpMode = false;
+        let isInitialLoad = true;
+        let activeTokenObj = null;
+        let activeWeekIndex = -1;
+
+        // Signature Canvas Logic
+        const ctx = sigCanvas.getContext('2d');
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            sigCanvas.width = sigCanvas.offsetWidth;
+            sigCanvas.height = sigCanvas.offsetHeight;
+            ctx.strokeStyle = "#005F73";
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            const pos = getPos(e);
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function getPos(e) {
+            const rect = sigCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        sigCanvas.addEventListener('mousedown', startDrawing);
+        sigCanvas.addEventListener('mousemove', draw);
+        sigCanvas.addEventListener('mouseup', stopDrawing);
+
+        sigCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+        sigCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+        sigCanvas.addEventListener('touchend', stopDrawing);
+
+        btnClearSig.addEventListener('click', () => {
+            ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+        });
+
+        // Drawer Navigation Logic
+        btnOpenDrawer.addEventListener('click', () => {
+            sideDrawer.classList.add('open');
+            drawerOverlay.classList.add('active');
+        });
+
+        drawerOverlay.addEventListener('click', closeDrawer);
+
+        function closeDrawer() {
+            sideDrawer.classList.remove('open');
+            drawerOverlay.classList.remove('active');
+        }
+
+        btnNavHome.addEventListener('click', () => {
+            closeDrawer();
+            showDashboardHome();
+        });
+
+        btnNavAddVillages.addEventListener('click', () => {
+            closeDrawer();
+            showAddVillagesScreen();
+        });
+
+        // Day Navigation Page
+        window.openDayPage = function(dayKey) {
+            activeDayKey = dayKey;
+            hideAllScreens();
+            headerBar.classList.remove('hidden');
+            dayPageScreen.classList.remove('hidden');
+
+            const dayNames = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday' };
+            document.getElementById('dayPageHeaderTitle').innerText = `Select the Village (${dayNames[dayKey]})`;
+
+            loadVillagesSpinner();
+        };
+
+        function loadVillagesSpinner() {
+            const currentUser = auth.currentUser;
+            const userEmail = currentUser ? currentUser.email : 'guest';
+            const storageKey = `villages_${userEmail}_${activeDayKey}`;
+            const villages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+            villageSelectSpinner.innerHTML = '';
+            if (villages.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.innerText = "No villages added";
+                villageSelectSpinner.appendChild(opt);
+                renderVillageTokens();
+            } else {
+                villages.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v;
+                    opt.innerText = v;
+                    villageSelectSpinner.appendChild(opt);
+                });
+                renderVillageTokens();
+            }
+        }
+
+        villageSelectSpinner.addEventListener('change', renderVillageTokens);
+
+        function renderVillageTokens() {
+            villageTokensList.innerHTML = '';
+            const selectedVillage = villageSelectSpinner.value;
+            if (!selectedVillage) return;
+
+            const currentUser = auth.currentUser;
+            const userEmail = currentUser ? currentUser.email : 'guest';
+            const tokenStorageKey = `tokens_${userEmail}_${activeDayKey}_${selectedVillage}`;
+            const tokens = JSON.parse(localStorage.getItem(tokenStorageKey) || '[]');
+
+            tokens.forEach((tok, index) => {
+                const card = document.createElement('div');
+                card.className = 'token-card';
+                card.onclick = () => open12WeeksSchedule(tok, index);
+                card.innerHTML = `
+                    <div class="token-info">
+                        <div class="token-number">Token: ${tok.tokenNum}</div>
+                        <div class="token-sub">Start Date: ${tok.startDate}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 14px; font-weight: 800; color: var(--dark-teal);">₹${tok.totalMoney}</div>
+                        <div style="font-size: 12px; font-weight: 700; color: var(--slate-blue);">₹${tok.weeklyMoney}/wk</div>
+                    </div>
+                `;
+                villageTokensList.appendChild(card);
+            });
+        }
+
+        // Create Token Flow
+        btnOpenAddTokenModal.addEventListener('click', () => {
+            const selectedVillage = villageSelectSpinner.value;
+            if (!selectedVillage || selectedVillage === "") {
+                alert("Please select or add a village first!");
+                return;
+            }
+            addTokenModal.classList.remove('hidden');
+        });
+
+        btnCloseTokenModal.addEventListener('click', () => {
+            addTokenModal.classList.add('hidden');
+        });
+
+        btnSubmitToken.addEventListener('click', () => {
+            const selectedVillage = villageSelectSpinner.value;
+            const tokenNum = tokenNumInput.value.trim();
+            const totalMoney = tokenTotalMoneyInput.value.trim();
+            const weeklyMoney = tokenWeeklyMoneyInput.value.trim();
+            const startDate = tokenStartDateInput.value;
+
+            if (!tokenNum || !totalMoney || !weeklyMoney || !startDate) {
+                alert("Please fill in all token details.");
+                return;
+            }
+
+            const currentUser = auth.currentUser;
+            const userEmail = currentUser ? currentUser.email : 'guest';
+            const tokenStorageKey = `tokens_${userEmail}_${activeDayKey}_${selectedVillage}`;
+            const tokens = JSON.parse(localStorage.getItem(tokenStorageKey) || '[]');
+
+            const newToken = {
+                tokenNum,
+                totalMoney,
+                weeklyMoney,
+                startDate,
+                village: selectedVillage,
+                payments: {} // Store payments indexed by week index (0-11)
+            };
+
+            tokens.push(newToken);
+            localStorage.setItem(tokenStorageKey, JSON.stringify(tokens));
+
+            tokenNumInput.value = '';
+            tokenTotalMoneyInput.value = '';
+            tokenWeeklyMoneyInput.value = '';
+            tokenStartDateInput.value = '';
+
+            addTokenModal.classList.add('hidden');
+            renderVillageTokens();
+        });
+
+        // 12 Weeks Schedule Calculation & Display
+        function open12WeeksSchedule(tok, tokIndex) {
+            activeTokenObj = { ...tok, tokIndex };
+            hideAllScreens();
+            headerBar.classList.remove('hidden');
+            weeksScheduleScreen.classList.remove('hidden');
+
+            document.getElementById('scheduleTokenNum').innerText = `Token #${tok.tokenNum}`;
+            document.getElementById('scheduleVillageName').innerText = `Village: ${tok.village}`;
+            document.getElementById('scheduleTotalMoney').innerText = `Total: ₹${tok.totalMoney}`;
+            document.getElementById('scheduleWeeklyMoney').innerText = `Weekly: ₹${tok.weeklyMoney}`;
+
+            const container = document.getElementById('weeksListContainer');
+            container.innerHTML = '';
+
+            const start = new Date(tok.startDate);
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            for (let i = 0; i < 12; i++) {
+                const currentWeekDate = new Date(start);
+                currentWeekDate.setDate(start.getDate() + (i * 7));
+
+                const dStr = String(currentWeekDate.getDate()).padStart(2, '0');
+                const mStr = String(currentWeekDate.getMonth() + 1).padStart(2, '0');
+                const yStr = currentWeekDate.getFullYear();
+                const dayName = daysOfWeek[currentWeekDate.getDay()];
+                const formattedDate = `${dStr}-${mStr}-${yStr} (${dayName})`;
+
+                const isPaid = tok.payments && tok.payments[i];
+
+                const card = document.createElement('div');
+                card.className = `week-item-card ${isPaid ? 'paid' : ''}`;
+                card.onclick = () => openPaymentModal(i, formattedDate, isPaid ? tok.payments[i] : null);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="week-title">Week ${i + 1}</div>
+                        <div class="week-date">${formattedDate}</div>
+                    </div>
+                    <div class="status-badge ${isPaid ? 'paid' : ''}">${isPaid ? 'Already Paid' : 'Pay Now'}</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        window.returnToDayPage = function() {
+            hideAllScreens();
+            headerBar.classList.remove('hidden');
+            dayPageScreen.classList.remove('hidden');
+            renderVillageTokens();
+        };
+
+        // Payment & Signature Modal Logic
+        function openPaymentModal(weekIdx, formattedDate, paidData) {
+            activeWeekIndex = weekIdx;
+            document.getElementById('paymentModalWeekTitle').innerText = `Week ${weekIdx + 1} Payment`;
+            paymentModal.classList.remove('hidden');
+
+            if (paidData) {
+                // Show Already Paid View
+                paymentFormSection.classList.add('hidden');
+                paidDetailsSection.classList.remove('hidden');
+
+                document.getElementById('paidAmountText').innerText = `Amount Paid: ₹${paidData.amount}`;
+                document.getElementById('paidMethodText').innerText = `Method: ${paidData.method}`;
+                document.getElementById('paidSigImage').src = paidData.signature;
+            } else {
+                // Show Entry Form View
+                paymentFormSection.classList.remove('hidden');
+                paidDetailsSection.classList.add('hidden');
+
+                payAmountInput.value = activeTokenObj.weeklyMoney || '';
+                setTimeout(resizeCanvas, 100);
+            }
+        }
+
+        btnClosePaymentModal.addEventListener('click', () => {
+            paymentModal.classList.add('hidden');
+        });
+
+        btnSubmitPayment.addEventListener('click', () => {
+            const amount = payAmountInput.value.trim();
+            const method = payMethodSelect.value;
+            const sigData = sigCanvas.toDataURL();
+
+            if (!amount) {
+                alert("Please enter given amount.");
+                return;
+            }
+
+            const currentUser = auth.currentUser;
+            const userEmail = currentUser ? currentUser.email : 'guest';
+            const selectedVillage = activeTokenObj.village;
+            const tokenStorageKey = `tokens_${userEmail}_${activeDayKey}_${selectedVillage}`;
+            const tokens = JSON.parse(localStorage.getItem(tokenStorageKey) || '[]');
+
+            if (!tokens[activeTokenObj.tokIndex].payments) {
+                tokens[activeTokenObj.tokIndex].payments = {};
+            }
+
+            tokens[activeTokenObj.tokIndex].payments[activeWeekIndex] = {
+                amount,
+                method,
+                signature: sigData,
+                paidAt: new Date().toISOString()
+            };
+
+            localStorage.setItem(tokenStorageKey, JSON.stringify(tokens));
+            paymentModal.classList.add('hidden');
+
+            // Refresh 12-week schedule list view
+            open12WeeksSchedule(tokens[activeTokenObj.tokIndex], activeTokenObj.tokIndex);
+        });
+
+        // Add Villages View Functions
+        function showAddVillagesScreen() {
+            hideAllScreens();
+            headerBar.classList.remove('hidden');
+            addVillagesScreen.classList.remove('hidden');
+            selectAddVillageTab('mon');
+        }
+
+        window.selectAddVillageTab = function(dayKey) {
+            selectedAddDay = dayKey;
+            ['mon', 'tue', 'wed'].forEach(d => {
+                const btn = document.getElementById(`addTab${d.charAt(0).toUpperCase() + d.slice(1)}`);
+                if (btn) {
+                    if (d === dayKey) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+
+            const dayNames = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday' };
+            addVillageLabel.innerText = `Villages on ${dayNames[dayKey]}`;
+            renderCurrentVillages();
+        };
+
+        btnAddVillage.addEventListener('click', () => {
+            const val = newVillageInput.value.trim();
+            if (!val) {
+                alert("Please enter a village name.");
+                return;
+            }
+
+            const currentUser = auth.currentUser;
+            const userEmail = currentUser ? currentUser.email : 'guest';
+            const storageKey = `villages_${userEmail}_${selectedAddDay}`;
+
+            const villages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            villages.push(val);
+            localStorage.setItem(storageKey, JSON.stringify(villages));
+
+            newVillageInput.value = '';
+            renderCurrentVillages();
+            alert(`Village "${val}" added successfully!`);
+        });
+
+        function renderCurrentVillages() {
+            const currentUser = auth.currentUser;
+            const userEmail = currentUser ? currentUser.email : 'guest';
+            const storageKey = `villages_${userEmail}_${selectedAddDay}`;
+            const villages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+            if (villages.length === 0) {
+                currentVillagesList.innerText = "None";
+            } else {
+                currentVillagesList.innerText = villages.join(', ');
+            }
+        }
+
+        window.showDashboardHome = function() {
+            hideAllScreens();
+            headerBar.classList.remove('hidden');
+            userScreen.classList.remove('hidden');
+        };
+
+        function hideAllScreens() {
+            userScreen.classList.add('hidden');
+            dayPageScreen.classList.add('hidden');
+            addVillagesScreen.classList.add('hidden');
+            weeksScheduleScreen.classList.add('hidden');
+        }
+
+        // Auth Logic & State Handlers
+        toggleText.addEventListener('click', () => {
+            isSignUpMode = !isSignUpMode;
+            if (isSignUpMode) {
+                nameInputGroup.classList.remove('hidden');
+                signUpName.setAttribute('required', 'true');
+                btnSubmitAuth.innerText = 'Create Account';
+                toggleText.innerText = 'Already have an account? Login';
+            } else {
+                nameInputGroup.classList.add('hidden');
+                signUpName.removeAttribute('required');
+                btnSubmitAuth.innerText = 'Login';
+                toggleText.innerText = "Don't have an account? Sign Up";
+            }
+        });
+
+        userAvatar.addEventListener('click', () => {
+            profilePopover.classList.toggle('hidden');
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (isInitialLoad) {
+                    isInitialLoad = false;
+                    runLoadingScreen(() => showUserDashboard(user));
+                }
+            } else {
+                isInitialLoad = false;
+                authScreen.classList.remove('hidden');
+                loadingScreen.classList.add('hidden');
+                hideAllScreens();
+                headerBar.classList.add('hidden');
+            }
+        });
+
+        function runLoadingScreen(callback) {
+            authScreen.classList.add('hidden');
+            hideAllScreens();
+            headerBar.classList.add('hidden');
+            loadingScreen.classList.remove('hidden');
+
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                callback();
+            }, 5000);
+        }
+
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+
+            if (isSignUpMode) {
+                const name = signUpName.value.trim();
+                if (!name) {
+                    alert("Please enter your Full Name.");
+                    return;
+                }
+
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        localStorage.setItem('name_' + email, name);
+                        runLoadingScreen(() => showUserDashboard(userCredential.user));
+                    })
+                    .catch((error) => alert("Sign Up Error: " + error.message));
+            } else {
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        runLoadingScreen(() => showUserDashboard(userCredential.user));
+                    })
+                    .catch((error) => alert("Login Error: " + error.message));
+            }
+        });
+
+        btnGoogleLogin.addEventListener('click', () => {
+            if (window.AndroidBridge && window.AndroidBridge.launchGoogleSignIn) {
+                window.AndroidBridge.launchGoogleSignIn();
+            } else {
+                signInWithPopup(auth, googleProvider)
+                    .then((result) => {
+                        runLoadingScreen(() => showUserDashboard(result.user));
+                    })
+                    .catch((error) => alert("Google Sign-In Error: " + error.message));
+            }
+        });
+
+        window.handleNativeGoogleSuccess = function(idToken) {
+            const credential = GoogleAuthProvider.credential(idToken);
+            signInWithCredential(auth, credential)
+                .then((result) => runLoadingScreen(() => showUserDashboard(result.user)))
+                .catch((error) => alert("Firebase Native Auth Error: " + error.message));
+        };
+
+        window.handleNativeGoogleError = function(errorMsg) {
+            alert("Native Sign-In Cancelled/Error: " + errorMsg);
+        };
+
+        function showUserDashboard(user) {
+            authScreen.classList.add('hidden');
+            loadingScreen.classList.add('hidden');
+            headerBar.classList.remove('hidden');
+            userScreen.classList.remove('hidden');
+
+            const email = user.email || "";
+            displayEmail.innerText = "Email: " + email;
+
+            const savedName = localStorage.getItem('name_' + email) || user.displayName || "";
+            const savedPhone = localStorage.getItem('phone_' + email) || "";
+
+            if (savedName) {
+                userAvatar.innerText = savedName.charAt(0).toUpperCase();
+                welcomeTitle.innerText = savedName;
+            } else if (email) {
+                userAvatar.innerText = email.charAt(0).toUpperCase();
+                welcomeTitle.innerText = "User Profile";
+            }
+
+            userName.value = savedName;
+            userPhone.value = savedPhone;
+
+            const isGoogleUser = user.providerData.some(p => p.providerId === 'google.com');
+            const hasPassword = user.providerData.some(p => p.providerId === 'password');
+
+            if (isGoogleUser && (!savedName || !hasPassword)) {
+                googleSetupBox.classList.remove('hidden');
+                profilePopover.classList.remove('hidden');
+            } else {
+                googleSetupBox.classList.add('hidden');
+            }
+
+            startLiveClockAndDate();
+            initLocationDetection();
+        }
+
+        function startLiveClockAndDate() {
+            function updateTime() {
+                const now = new Date();
+
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = now.getFullYear();
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+                dateDayText.innerText = `${day}-${month}-${year} ${days[now.getDay()]}`;
+
+                const monthsShort = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+                calendarMonthText.innerText = monthsShort[now.getMonth()];
+
+                let hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+
+                hours = hours % 12 || 12;
+                liveClockText.innerText = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function initLocationDetection() {
+            if (window.AndroidBridge && window.AndroidBridge.getUserLocation) {
+                const loc = window.AndroidBridge.getUserLocation();
+                if (loc) {
+                    userLocationText.innerText = loc;
+                    return;
+                }
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                const city = data.address.city || data.address.town || data.address.village || data.address.county || "Location Found";
+                                const state = data.address.state ? `, ${data.address.state}` : "";
+                                userLocationText.innerText = `${city}${state}`;
+                            })
+                            .catch(() => {
+                                userLocationText.innerText = `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+                            });
+                    },
+                    () => { userLocationText.innerText = "Location Permission Denied"; },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                userLocationText.innerText = "Location Not Supported";
+            }
+        }
+
+        window.updateNativeLocation = function(locationString) {
+            if (userLocationText) {
+                userLocationText.innerText = locationString;
+            }
+        };
+
+        btnSaveGoogleSetup.addEventListener('click', () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = setupNameInput.value.trim();
+            const newPassword = setupPasswordInput.value.trim();
+
+            if (!name) {
+                alert("Please enter your name.");
+                return;
+            }
+            if (newPassword.length < 6) {
+                alert("Password must be at least 6 characters.");
+                return;
+            }
+
+            localStorage.setItem('name_' + user.email, name);
+            welcomeTitle.innerText = name;
+            userName.value = name;
+            userAvatar.innerText = name.charAt(0).toUpperCase();
+
+            updatePassword(user, newPassword)
+                .then(() => {
+                    alert("Account setup completed!");
+                    googleSetupBox.classList.add('hidden');
+                })
+                .catch((error) => alert("Setup error: " + error.message));
+        });
+
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const name = userName.value.trim();
+            const phone = userPhone.value.trim();
+
+            localStorage.setItem('name_' + user.email, name);
+            localStorage.setItem('phone_' + user.email, phone);
+
+            if (name) {
+                welcomeTitle.innerText = name;
+                userAvatar.innerText = name.charAt(0).toUpperCase();
+            }
+
+            alert("Profile details saved!");
+            profilePopover.classList.add('hidden');
+        });
+
+        btnLogout.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                authForm.reset();
+                profilePopover.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
