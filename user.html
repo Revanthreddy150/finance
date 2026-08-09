@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QHP Merchant Portal</title>
+  <style>
+    :root {
+      --qhp-blue: #0b4eac;
+      --qhp-dark-blue: #093c83;
+      --qhp-orange: #ff9800;
+      --bg-light: #f0f2f5;
+      --border-color: #e2e8f0;
+      --text-main: #1c1c1c;
+      --text-muted: #64748b;
+      --green-veg: #24963f;
+      --red-nonveg: #e23744;
+      --blue-accent: #2563eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg-light); color: var(--text-main); min-height: 100vh; }
+
+    /* AUTHENTICATION STYLES */
+    .auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px 16px; }
+    .auth-card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); width: 100%; max-width: 440px; padding: 32px 24px; text-align: center; }
+    .logo { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .logo-blue { color: var(--qhp-blue); }
+    .logo-orange { color: var(--qhp-orange); }
+    .subtitle { font-size: 14px; color: #6c757d; margin-bottom: 24px; line-height: 1.4; }
+    .tab-group { display: flex; background-color: #f8f9fa; padding: 4px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+    .tab-btn { flex: 1; padding: 10px 0; font-size: 14px; font-weight: 600; color: #6c757d; border: none; background: transparent; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; }
+    .tab-btn.active { background-color: #ffffff; color: var(--qhp-blue); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .btn-google { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; border: 1px solid #ced4da; border-radius: 8px; background-color: #ffffff; font-size: 15px; font-weight: 600; color: #3e506d; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+    .btn-google:hover { background-color: #f8f9fa; border-color: #b0b4b9; }
+    .google-icon { width: 20px; height: 20px; margin-right: 10px; flex-shrink: 0; }
+    .divider { display: flex; align-items: center; color: #6c757d; font-size: 12px; margin: 20px 0; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background-color: #e2e8f0; }
+    .divider span { padding: 0 12px; }
+    .form-group { text-align: left; margin-bottom: 16px; }
+    label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: #3e506d; margin-bottom: 6px; }
+    input, select { width: 100%; height: 46px; padding: 0 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 14px; background-color: #ffffff; color: #333333; transition: border-color 0.2s, box-shadow 0.2s; appearance: none; -webkit-appearance: none; }
+    .select-wrapper { position: relative; }
+    .select-wrapper::after { content: "▼"; font-size: 10px; color: #6c757d; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+    input:focus, select:focus { outline: none; border-color: var(--qhp-blue); box-shadow: 0 0 0 3px rgba(11, 78, 172, 0.15); }
+    .btn-primary { display: flex; align-items: center; justify-content: center; width: 100%; height: 48px; background-color: var(--qhp-blue); color: #ffffff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background-color 0.2s; }
+    .btn-primary:hover { background-color: var(--qhp-dark-blue); }
+    .terms-text { font-size: 11px; color: #6c757d; margin-top: 16px; line-height: 1.4; }
+    .form-content { display: none; }
+    .form-content.active { display: block; }
+
+    /* MERCHANT TERMINAL APP STYLES */
+    .app-container { height: 100vh; display: flex; overflow: hidden; position: relative; }
+    
+    /* SIDEBAR DRAWER OVERLAY */
+    .drawer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; display: none; }
+    .drawer-overlay.active { display: block; }
+
+    /* SIDEBAR NAVIGATION (HIDDEN BY DEFAULT) */
+    .sidebar { width: 260px; background-color: #0d1b2a; color: #fff; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; position: absolute; top: 0; left: -260px; height: 100%; z-index: 100; transition: left 0.3s ease; }
+    .sidebar.open { left: 0; }
+    .brand-section { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; }
+    .brand-logo { font-size: 22px; font-weight: 800; color: #fff; }
+    .partner-tag { font-size: 10px; background: var(--qhp-orange); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+    .close-drawer { font-size: 20px; color: #fff; cursor: pointer; border: none; background: transparent; }
+
+    .nav-menu { list-style: none; padding: 15px 0; }
+    .nav-item { padding: 14px 20px; display: flex; align-items: center; gap: 12px; font-size: 14px; color: #94a3b8; cursor: pointer; border-left: 4px solid transparent; transition: all 0.2s; }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-item.active { color: #fff; background: rgba(11, 78, 172, 0.25); border-left-color: var(--qhp-blue); font-weight: 600; }
+    .nav-item .badge { background: var(--qhp-orange); color: white; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: auto; font-weight: 700; }
+
+    .outlet-selector { padding: 16px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.08); }
+    .outlet-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .outlet-id { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .logout-btn { display: block; width: 100%; margin-top: 10px; padding: 6px; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+
+    /* MAIN WRAPPER */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; width: 100%; }
+
+    /* TOP BAR */
+    .topbar { background: #fff; height: 60px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 16px; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .hamburger-btn { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-main); }
+    .topbar-title { font-size: 18px; font-weight: 700; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    
+    .status-toggle { display: flex; align-items: center; gap: 8px; background: #eef9f1; border: 1px solid #c2e8c8; padding: 6px 14px; border-radius: 20px; cursor: pointer; user-select: none; }
+    .status-toggle.offline { background: #fef2f2; border-color: #fca5a5; }
+    .status-dot { width: 8px; height: 8px; background: var(--green-veg); border-radius: 50%; box-shadow: 0 0 6px var(--green-veg); }
+    .status-toggle.offline .status-dot { background: #dc2626; box-shadow: 0 0 6px #dc2626; }
+    .status-text { font-size: 12px; font-weight: 700; color: #1e7e34; }
+    .status-toggle.offline .status-text { color: #dc2626; }
+
+    .sound-btn { background: var(--bg-light); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+    /* VIEW CONTAINERS */
+    .view-page { display: none; flex: 1; padding: 24px; overflow-y: auto; }
+    .view-page.active { display: block; }
+
+    /* PAGE 1: LIVE ORDERS */
+    .tabs-bar { display: flex; gap: 12px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; overflow-x: auto; }
+    .tab { font-size: 14px; font-weight: 600; color: var(--text-muted); padding: 8px 16px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--border-color); white-space: nowrap; }
+    .tab.active { background: var(--qhp-blue); color: #fff; border-color: var(--qhp-blue); }
+    .tab-count { background: rgba(0,0,0,0.08); padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+    .tab.active .tab-count { background: #fff; color: var(--qhp-blue); }
+
+    .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .empty-state { text-align: center; color: var(--text-muted); grid-column: 1 / -1; padding: 60px 0; font-size: 15px; }
+
+    .order-card { background: #fff; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; display: flex; flex-direction: column; }
+    .order-card.urgent { border: 2px solid var(--qhp-blue); }
+    .card-header { padding: 12px 16px; background: #fff; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .order-number { font-size: 15px; font-weight: 800; }
+    .order-timer { font-size: 11px; font-weight: 700; background: #eef4ff; color: var(--qhp-blue); padding: 4px 8px; border-radius: 4px; border: 1px solid #c7d9f8; }
+    .card-subheader { padding: 8px 16px; background: #fafafa; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+    .card-body { padding: 16px; flex: 1; }
+    .item-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .item-row { display: flex; justify-content: space-between; align-items: flex-start; font-size: 13px; }
+    .item-info { display: flex; align-items: center; gap: 8px; }
+    .qty { font-weight: 700; background: #f0f0f0; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+    .item-name { font-weight: 600; color: #222; }
+    .item-price { color: var(--text-muted); font-weight: 500; }
+
+    .card-footer { padding: 12px 16px; background: #fff; border-top: 1px solid #f0f0f0; display: flex; gap: 10px; }
+    .btn { flex: 1; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; text-align: center; border: none; }
+    .btn-outline { background: #fff; border: 1px solid #d1d5db; color: #374151; }
+    .btn-outline:hover { background: #f9fafb; }
+    .btn-primary-card { background: var(--green-veg); color: #fff; }
+    .btn-primary-card:hover { background: #1e7e34; }
+    .btn-blue { background: var(--blue-accent); color: #fff; }
+
+    /* MANAGEMENT SECTION STYLES */
+    .management-panel { background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px; }
+    .panel-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+    .add-form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .add-form-row input, .add-form-row select { flex: 1; min-width: 150px; }
+    .btn-action { padding: 0 20px; height: 46px; background: var(--qhp-blue); color: white; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; }
+
+    .controls-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 16px; flex-wrap: wrap; }
+    .search-input { padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; width: 100%; max-width: 280px; }
+    .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+    .data-table th, .data-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    .data-table th { background: #fafafa; font-weight: 700; color: var(--text-muted); }
+    
+    .toggle-switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 22px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--green-veg); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .stat-card { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .stat-title { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+    .stat-num { font-size: 26px; font-weight: 800; margin-top: 6px; color: var(--text-main); }
+    .stat-sub { font-size: 12px; color: var(--green-veg); font-weight: 600; margin-top: 4px; }
+
+    .chart-container { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px; }
+    .chart-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .bars-wrapper { display: flex; align-items: flex-end; gap: 16px; height: 160px; padding-top: 20px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+    .bar-fill { width: 100%; max-width: 40px; background: var(--qhp-blue); border-radius: 4px 4px 0 0; }
+    .bar-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+    /* COMING SOON UI */
+    .coming-soon-wrapper { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; background: #ffffff; }
+    .coming-soon-title { font-size: 32px; font-weight: 800; color: var(--qhp-blue); margin-bottom: 12px; }
+    .coming-soon-sub { font-size: 16px; color: var(--text-muted); max-width: 500px; margin-bottom: 24px; }
+
+    /* CUSTOM MODAL & TOAST STYLES */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 16px; }
+    .modal-overlay.active { display: flex; }
+    .custom-modal { background: #fff; border-radius: 12px; width: 100%; max-width: 420px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popIn 0.2s ease; }
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
+    .modal-body { font-size: 14px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
+    .token-highlight { font-weight: 800; color: var(--qhp-blue); background: #eef4ff; padding: 2px 6px; border-radius: 4px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-modal-cancel { padding: 10px 18px; background: #f1f5f9; color: #475569; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    .btn-modal-confirm { padding: 10px 18px; background: var(--qhp-blue); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+    .history-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 12px; text-align: left; }
+    .history-title { font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; font-size: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- ================= AUTHENTICATION PAGE ================= -->
+  <div id="auth-screen" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="logo">
+        <span class="logo-blue">QHP</span> <span class="logo-orange">Merchant</span>
+      </div>
+      <p class="subtitle" id="portal-subtitle">Access your merchant dashboard</p>
+
+      <div class="tab-group">
+        <button class="tab-btn active" id="login-tab" onclick="switchAuthTab('login')">Log In</button>
+        <button class="tab-btn" id="register-tab" onclick="switchAuthTab('register')">Create Account</button>
+      </div>
+
+      <button type="button" class="btn-google" onclick="handleGoogleLogin()">
+        <svg class="google-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.766 12.2764C23.766 11.4607 23.6999 10.6406 23.5588 9.83807H12.24V14.4591H18.7217C18.4528 15.9131 17.597 17.1582 16.3435 17.9729V20.9693H20.178C22.4314 18.9044 23.766 15.861 23.766 12.2764Z" fill="#4285F4"/>
+            <path d="M12.24 24.0008C15.4765 24.0008 18.2059 22.9382 20.1845 20.9693L16.3435 17.9729C15.2818 18.7072 13.8824 19.1111 12.24 19.1111C9.11029 19.1111 6.46324 17.0088 5.51324 14.1813H1.54853V17.2512C3.55368 21.2334 7.67206 24.0008 12.24 24.0008Z" fill="#34A853"/>
+            <path d="M5.51324 14.1813C5.26912 13.4545 5.13118 12.6805 5.13118 11.8906C5.13118 11.1007 5.26912 10.3267 5.51324 9.6H1.54853V6.52912C0.723529 8.16684 0.250588 9.97223 0.250588 11.8906C0.250588 13.809 0.723529 15.6144 1.54853 17.2521L5.51324 14.1813Z" fill="#FBBC05"/>
+            <path d="M12.24 4.65966C13.9919 4.65966 15.561 5.26161 16.8026 6.44851L20.2603 2.99081C18.1979 1.06389 15.4679 0 12.24 0C7.67206 0 3.55368 2.76735 1.54853 6.74951L5.51324 9.82033C6.46324 6.99286 9.11029 4.65966 12.24 4.65966Z" fill="#EA4335"/>
+        </svg>
+        <span id="google-btn-text">Sign in with Google</span>
+      </button>
+
+      <div class="divider">
+          <span>or use email</span>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="login-form" class="form-content active">
+          <form onsubmit="handleLogin(event)">
+              <div class="form-group">
+                  <label for="login-email">Email Address</label>
+                  <input type="email" id="login-email" placeholder="enter email" required autocomplete="email">
+              </div>
+              <button type="submit" class="btn-primary">Send Secure Link OTP</button>
+          </form>
+      </div>
+
+      <!-- CREATE ACCOUNT FORM -->
+      <div id="register-form" class="form-content">
+          <form onsubmit="handleRegister(event)">
+              <div class="form-group">
+                  <label for="reg-business">Business / Merchant Name</label>
+                  <input type="text" id="reg-business" placeholder="e.g. Royal Kitchen" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="reg-type">Business Type</label>
+                  <div class="select-wrapper">
+                      <select id="reg-type" required>
+                          <option value="" disabled selected>Select business type</option>
+                          <option value="restaurant">Restaurant</option>
+                          <option value="grocery">Grocery Store</option>
+                          <option value="mini-supermarket">Mini Supermarket</option>
+                          <option value="fancy-stores">Fancy Stores</option>
+                          <option value="medical-shop">Medical Shop</option>
+                          <option value="lodges">Lodges</option>
+                          <option value="car-rentals">Car Rentals</option>
+                          <option value="water-plants">Water Plants</option>
+                          <option value="tailoring">Tailoring</option>
+                          <option value="car-service">Car Service (Repair)</option>
+                          <option value="home-beauty">Home Beauty Maker</option>
+                          <option value="carpenters">Carpenters</option>
+                          <option value="ac-technician">AC Technician</option>
+                          <option value="plumbers">Plumbers</option>
+                          <option value="event-planners">Event Planners</option>
+                          <option value="food-catering">Food Catering</option>
+                          <option value="printing-shops">Printing Shops</option>
+                          <option value="photography">Photography</option>
+                          <option value="tourist-guiders">Tourist Guiders</option>
+                          <option value="trip-planners">Trip Planners</option>
+                      </select>
+                  </div>
+              </div>
+
+              <div class="form-group">
+                  <label for="reg-phone">Phone Number</label>
+                  <input type="tel" id="reg-phone" placeholder="enter phone number" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="reg-email">Email Address</label>
+                  <input type="email" id="reg-email" placeholder="enter email address" required autocomplete="email">
+              </div>
+
+              <div class="form-group">
+                  <label for="reg-password">Create Password</label>
+                  <input type="password" id="reg-password" placeholder="at least 8 characters" required>
+              </div>
+
+              <button type="submit" class="btn-primary">Create Merchant Account</button>
+          </form>
+
+          <p class="terms-text">
+              By registering, you agree to QHP Merchant Terms of Service and Privacy Policy.
+          </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COMING SOON SCREEN ================= -->
+  <div id="coming-soon-screen" class="coming-soon-wrapper" style="display: none;">
+    <div class="logo" style="margin-bottom: 20px;">
+      <span class="logo-blue">QHP</span> <span class="logo-orange">Merchant</span>
+    </div>
+    <h1 class="coming-soon-title">Coming Soon!</h1>
+    <p class="coming-soon-sub">We are currently crafting a custom merchant dashboard experience for your business category: <strong id="cs-type-display" style="color: var(--qhp-orange);"></strong>.</p>
+    <button class="btn-primary" style="width: 200px;" onclick="logout()">Log Out & Back</button>
+  </div>
+
+  <!-- ================= RESTAURANT / STORE TERMINAL APP ================= -->
+  <div id="restaurant-app" class="app-container" style="display: none;">
+    
+    <!-- DRAWER OVERLAY -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="toggleSidebar(false)"></div>
+
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="brand-section">
+          <div>
+            <span class="logo-blue" style="font-weight: 800; font-size: 20px; color: #fff;">QHP</span> 
+            <span class="logo-orange" style="font-weight: 800; font-size: 20px;">Merchant</span>
+          </div>
+          <button class="close-drawer" onclick="toggleSidebar(false)">✕</button>
+        </div>
+        <ul class="nav-menu">
+          <li class="nav-item active" onclick="navigate('live-orders', this)">
+            <span>Live Orders</span>
+            <span class="badge" id="nav-badge">1</span>
+          </li>
+          <li class="nav-item" onclick="navigate('menu-management', this)">
+            <span id="nav-stock-label">Stock Management</span>
+          </li>
+          <li class="nav-item" onclick="navigate('past-orders', this)">
+            <span>Past Orders</span>
+          </li>
+          <li class="nav-item" onclick="navigate('payouts', this)">
+            <span>Payouts & Reports</span>
+          </li>
+          <li class="nav-item" onclick="navigate('insights', this)">
+            <span>Business Insights</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="outlet-selector">
+        <div class="outlet-name" id="display-outlet-name">Royal Outlet</div>
+        <div class="outlet-id" id="display-outlet-email">merchant@qhp.com</div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <!-- 3-Lines Hamburger Icon -->
+          <button class="hamburger-btn" onclick="toggleSidebar(true)">☰</button>
+          <div class="topbar-title" id="page-title">Live Orders</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔊 Sound Alerts: ON</button>
+          <div class="status-toggle" id="status-toggle" onclick="toggleOutletStatus()">
+            <span class="status-dot"></span>
+            <span class="status-text" id="status-text">ONLINE & ACCEPTING</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- PAGE 1: LIVE ORDERS -->
+      <main class="view-page active" id="page-live-orders">
+        <div class="tabs-bar">
+          <div class="tab active" id="tab-incoming" onclick="switchOrderTab('incoming')">
+            Incoming <span class="tab-count" id="count-incoming">1</span>
+          </div>
+          <div class="tab" id="tab-preparing" onclick="switchOrderTab('preparing')">
+            Preparing <span class="tab-count" id="count-preparing">1</span>
+          </div>
+          <div class="tab" id="tab-ready" onclick="switchOrderTab('ready')">
+            Ready for Pickup <span class="tab-count" id="count-ready">0</span>
+          </div>
+          <div class="tab" id="tab-completed" onclick="switchOrderTab('completed')">
+            Completed <span class="tab-count" id="count-completed">12</span>
+          </div>
+        </div>
+
+        <div class="orders-grid" id="orders-grid"></div>
+      </main>
+
+      <!-- PAGE 2: STOCK / MENU MANAGEMENT -->
+      <main class="view-page" id="page-menu-management">
+        
+        <!-- SECTION / CATEGORY MANAGEMENT -->
+        <div class="management-panel">
+          <div class="panel-title">1. Add New Section / Category</div>
+          <form onsubmit="handleAddSection(event)" class="add-form-row">
+            <input type="text" id="new-section-name" placeholder="e.g. Snacks, Drinks, Cosmetics" required />
+            <button type="submit" class="btn-action">Add Section</button>
+          </form>
+        </div>
+
+        <!-- ITEM ADDITION -->
+        <div class="management-panel">
+          <div class="panel-title">2. Add Item / Token to Section</div>
+          <form onsubmit="handleAddItem(event)" class="add-form-row">
+            <input type="text" id="new-item-token" placeholder="Token No (e.g. TKN-104)" required style="max-width: 160px;" />
+            <input type="text" id="new-item-name" placeholder="Item Name (e.g. Lays Potato Chips)" required />
+            <div class="select-wrapper" style="flex: 1; min-width: 150px;">
+              <select id="select-item-category" required>
+                <option value="" disabled selected>Select Section</option>
+              </select>
+            </div>
+            <input type="number" id="new-item-price" placeholder="Price (₹)" required />
+            <button type="submit" class="btn-action">Add Token</button>
+          </form>
+        </div>
+
+        <div class="controls-row">
+          <input type="text" class="search-input" id="menu-search" placeholder="Search token or item name..." onkeyup="filterMenu()" />
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">
+            Total Items: <span id="menu-count">0</span>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Token No</th>
+              <th>Item Name</th>
+              <th>Section / Category</th>
+              <th>Price</th>
+              <th>Availability Status</th>
+              <th>Paid Status / Week</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="menu-table-body"></tbody>
+        </table>
+      </main>
+
+      <!-- PAGE 3: PAST ORDERS -->
+      <main class="view-page" id="page-past-orders">
+        <div class="controls-row">
+          <input type="text" class="search-input" id="past-search" placeholder="Search Order ID or Customer..." onkeyup="filterPastOrders()" />
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Bill Amount</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="past-table-body"></tbody>
+        </table>
+      </main>
+
+      <!-- PAGE 4: PAYOUTS & REPORTS -->
+      <main class="view-page" id="page-payouts">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Gross Sales (This Week)</div>
+            <div class="stat-num">₹42,850</div>
+            <div class="stat-sub">+14% vs last week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">QHP Commission</div>
+            <div class="stat-num">₹7,713</div>
+            <div class="stat-sub">18% flat rate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Taxes & Charges (GST)</div>
+            <div class="stat-num">₹2,142</div>
+            <div class="stat-sub">5% GST included</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Net Settled Payout</div>
+            <div class="stat-num" style="color: var(--green-veg);">₹32,995</div>
+            <div class="stat-sub">Scheduled for Monday</div>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 16px; font-size: 16px;">Payout Settlement Log</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Settlement Date</th>
+              <th>Cycle Period</th>
+              <th>Orders Count</th>
+              <th>Net Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Aug 03, 2026</td>
+              <td>Jul 27 - Aug 02</td>
+              <td>142 Orders</td>
+              <td>₹31,400.00</td>
+              <td><span style="color: var(--green-veg); font-weight: 700;">✓ Settled to Bank *8921</span></td>
+            </tr>
+            <tr>
+              <td>Jul 27, 2026</td>
+              <td>Jul 20 - Jul 26</td>
+              <td>128 Orders</td>
+              <td>₹28,150.00</td>
+              <td><span style="color: var(--green-veg); font-weight: 700;">✓ Settled to Bank *8921</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </main>
+
+      <!-- PAGE 5: BUSINESS INSIGHTS -->
+      <main class="view-page" id="page-insights">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Average Processing Time</div>
+            <div class="stat-num">8.5 mins</div>
+            <div class="stat-sub">Target: &lt; 10 mins</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Merchant Rating</div>
+            <div class="stat-num">4.8 ★</div>
+            <div class="stat-sub">Based on 620 reviews</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Order Acceptance Rate</div>
+            <div class="stat-num">99.1%</div>
+            <div class="stat-sub">High fulfillment</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Avg Order Value (AOV)</div>
+            <div class="stat-num">₹412</div>
+            <div class="stat-sub">+₹35 higher this month</div>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-title">Peak Order Volume by Time Window</div>
+          <div class="bars-wrapper">
+            <div class="bar-col"><div class="bar-fill" style="height: 25%;"></div><span class="bar-label">12 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 85%;"></div><span class="bar-label">1 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 60%;"></div><span class="bar-label">2 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 20%;"></div><span class="bar-label">3 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 40%;"></div><span class="bar-label">7 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 95%;"></div><span class="bar-label">8 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 100%;"></div><span class="bar-label">9 PM</span></div>
+            <div class="bar-col"><div class="bar-fill" style="height: 70%;"></div><span class="bar-label">10 PM</span></div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- CUSTOM CONFIRMATION EDIT TOAST/MODAL -->
+  <div class="modal-overlay" id="edit-modal-overlay">
+    <div class="custom-modal">
+      <div class="modal-header">Edit Token Confirmation</div>
+      <div class="modal-body">
+        Do you want to edit the token <span class="token-highlight" id="modal-token-num"></span> (<strong id="modal-token-name"></strong>)?
+        
+        <div class="history-card">
+          <div class="history-title">Payment & Status Record</div>
+          <div>• <strong>Payment Status:</strong> <span id="modal-paid-status"></span></div>
+          <div>• <strong>Paid Up To:</strong> <span id="modal-paid-week"></span></div>
+        </div>
+
+        <div class="history-card" id="modal-prev-details-card" style="display:none;">
+          <div class="history-title">Previous Edit Log</div>
+          <div id="modal-prev-details"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
+        <button class="btn-modal-confirm" onclick="confirmEditToken()">Yes, Enable Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY DETAILS MODAL -->
+  <div class="modal-overlay" id="history-modal-overlay">
+    <div class="custom-modal">
+      <div class="modal-header" id="hist-modal-header">Token History</div>
+      <div class="modal-body" id="hist-modal-body"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-confirm" onclick="closeHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ALLOWED INTERACTIVE TYPES
+    const STORE_TYPES = ["restaurant", "grocery", "mini-supermarket", "fancy-stores"];
+    let pendingEditItemId = null;
+
+    document.addEventListener("DOMContentLoaded", function() {
+      checkActiveUser();
+      initDefaultStoreData();
+    });
+
+    function checkActiveUser() {
+      const activeUser = JSON.parse(localStorage.getItem("qhp_active_user"));
+      const authScreen = document.getElementById("auth-screen");
+      const restaurantApp = document.getElementById("restaurant-app");
+      const comingSoonScreen = document.getElementById("coming-soon-screen");
+
+      if (activeUser) {
+        authScreen.style.display = "none";
+        
+        if (STORE_TYPES.includes(activeUser.businessType)) {
+          restaurantApp.style.display = "flex";
+          comingSoonScreen.style.display = "none";
+          document.getElementById("display-outlet-name").innerText = activeUser.businessName || "My Store";
+          document.getElementById("display-outlet-email").innerText = activeUser.email;
+
+          // Customize menu tab title based on store type
+          const navStockLabel = document.getElementById("nav-stock-label");
+          if (activeUser.businessType === "restaurant") {
+            navStockLabel.innerText = "Menu Management";
+          } else {
+            navStockLabel.innerText = "Stock Management";
+          }
+
+          renderLiveOrders();
+          updateSectionDropdown();
+        } else {
+          restaurantApp.style.display = "none";
+          comingSoonScreen.style.display = "flex";
+          document.getElementById("cs-type-display").innerText = activeUser.businessType;
+        }
+      } else {
+        authScreen.style.display = "flex";
+        restaurantApp.style.display = "none";
+        comingSoonScreen.style.display = "none";
+      }
+    }
+
+    function switchAuthTab(type) {
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const loginTab = document.getElementById('login-tab');
+      const registerTab = document.getElementById('register-tab');
+      const googleBtnText = document.getElementById('google-btn-text');
+      const portalSubtitle = document.getElementById('portal-subtitle');
+
+      if (type === 'login') {
+          loginForm.classList.add('active');
+          registerForm.classList.remove('active');
+          loginTab.classList.add('active');
+          registerTab.classList.remove('active');
+          googleBtnText.innerText = 'Sign in with Google';
+          portalSubtitle.innerText = 'Access your merchant dashboard';
+      } else {
+          registerForm.classList.add('active');
+          loginForm.classList.remove('active');
+          registerTab.classList.add('active');
+          loginTab.classList.remove('active');
+          googleBtnText.innerText = 'Sign up with Google';
+          portalSubtitle.innerText = 'Start accepting payments with QHP';
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const businessName = document.getElementById("reg-business").value;
+      const businessType = document.getElementById("reg-type").value;
+      const phone = document.getElementById("reg-phone").value;
+      const email = document.getElementById("reg-email").value;
+      const password = document.getElementById("reg-password").value;
+
+      let merchants = JSON.parse(localStorage.getItem("qhp_merchants")) || [];
+      const existing = merchants.find(m => m.email === email);
+      if (existing) {
+        alert("An account with this email already exists!");
+        return;
+      }
+
+      const newMerchant = { businessName, businessType, phone, email, password };
+      merchants.push(newMerchant);
+      localStorage.setItem("qhp_merchants", JSON.stringify(merchants));
+      localStorage.setItem("qhp_active_user", JSON.stringify(newMerchant));
+
+      checkActiveUser();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      let merchants = JSON.parse(localStorage.getItem("qhp_merchants")) || [];
+      
+      let existing = merchants.find(m => m.email === email);
+      if (!existing) {
+        existing = { businessName: "QHP Merchant Store", businessType: "grocery", phone: "9876543210", email: email };
+        merchants.push(existing);
+        localStorage.setItem("qhp_merchants", JSON.stringify(merchants));
+      }
+
+      localStorage.setItem("qhp_active_user", JSON.stringify(existing));
+      checkActiveUser();
+    }
+
+    function handleGoogleLogin() {
+      const mockUser = { businessName: "QHP Supermarket", businessType: "mini-supermarket", phone: "9999999999", email: "merchant@gmail.com" };
+      localStorage.setItem("qhp_active_user", JSON.stringify(mockUser));
+      checkActiveUser();
+    }
+
+    function logout() {
+      localStorage.removeItem("qhp_active_user");
+      checkActiveUser();
+    }
+
+    // DRAWER SIDEBAR CONTROL
+    function toggleSidebar(open) {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('drawer-overlay');
+      if (open) {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+      } else {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      }
+    }
+
+    // LOCAL STORAGE MANAGEMENT FOR SECTIONS & ITEMS
+    function initDefaultStoreData() {
+      if (!localStorage.getItem("qhp_sections")) {
+        const defaultSections = ["Snacks", "Beverages", "Groceries", "General Item"];
+        localStorage.setItem("qhp_sections", JSON.stringify(defaultSections));
+      }
+
+      if (!localStorage.getItem("qhp_stock_items")) {
+        const defaultItems = [
+          { id: 101, tokenNo: "TKN-101", name: "Potato Chips Pack", category: "Snacks", price: 30, available: true, paidWeek: "Week 31, 2026", isPaid: true, history: [] },
+          { id: 102, tokenNo: "TKN-102", name: "Orange Juice 1L", category: "Beverages", price: 110, available: true, paidWeek: "Week 32, 2026", isPaid: true, history: [] },
+          { id: 103, tokenNo: "TKN-103", name: "Basmati Rice 5kg", category: "Groceries", price: 450, available: true, paidWeek: "Pending Payment", isPaid: false, history: [] }
+        ];
+        localStorage.setItem("qhp_stock_items", JSON.stringify(defaultItems));
+      }
+    }
+
+    function updateSectionDropdown() {
+      const sections = JSON.parse(localStorage.getItem("qhp_sections")) || [];
+      const select = document.getElementById("select-item-category");
+      select.innerHTML = `<option value="" disabled selected>Select Section</option>`;
+      sections.forEach(sec => {
+        select.innerHTML += `<option value="${sec}">${sec}</option>`;
+      });
+    }
+
+    function handleAddSection(e) {
+      e.preventDefault();
+      const input = document.getElementById("new-section-name");
+      const sectionName = input.value.trim();
+      if (!sectionName) return;
+
+      let sections = JSON.parse(localStorage.getItem("qhp_sections")) || [];
+      if (!sections.includes(sectionName)) {
+        sections.push(sectionName);
+        localStorage.setItem("qhp_sections", JSON.stringify(sections));
+        updateSectionDropdown();
+        alert(`Section "${sectionName}" added successfully!`);
+      } else {
+        alert("Section already exists!");
+      }
+      input.value = "";
+    }
+
+    function handleAddItem(e) {
+      e.preventDefault();
+      const tokenNo = document.getElementById("new-item-token").value.trim();
+      const name = document.getElementById("new-item-name").value.trim();
+      const category = document.getElementById("select-item-category").value;
+      const price = parseFloat(document.getElementById("new-item-price").value);
+
+      if (!tokenNo || !name || !category || isNaN(price)) return;
+
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      const newItem = {
+        id: Date.now(),
+        tokenNo,
+        name,
+        category,
+        price,
+        available: true,
+        paidWeek: "Week 32, 2026",
+        isPaid: true,
+        history: []
+      };
+      items.push(newItem);
+      localStorage.setItem("qhp_stock_items", JSON.stringify(items));
+
+      document.getElementById("new-item-token").value = "";
+      document.getElementById("new-item-name").value = "";
+      document.getElementById("new-item-price").value = "";
+      renderMenuTable();
+    }
+
+    function promptEditToken(itemId) {
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      pendingEditItemId = itemId;
+      document.getElementById("modal-token-num").innerText = item.tokenNo || `#${item.id}`;
+      document.getElementById("modal-token-name").innerText = item.name;
+      document.getElementById("modal-paid-status").innerText = item.isPaid ? "Paid" : "Unpaid / Pending";
+      document.getElementById("modal-paid-status").style.color = item.isPaid ? "var(--green-veg)" : "#dc2626";
+      document.getElementById("modal-paid-week").innerText = item.paidWeek || "N/A";
+
+      const prevCard = document.getElementById("modal-prev-details-card");
+      const prevDetails = document.getElementById("modal-prev-details");
+
+      if (item.history && item.history.length > 0) {
+        prevCard.style.display = "block";
+        const lastHist = item.history[item.history.length - 1];
+        prevDetails.innerHTML = `
+          <div>• <strong>Old Token:</strong> ${lastHist.tokenNo} | <strong>Old Name:</strong> ${lastHist.name}</div>
+          <div>• <strong>Old Price:</strong> ₹${lastHist.price} | <strong>Old Category:</strong> ${lastHist.category}</div>
+          <div>• <strong>Edited On:</strong> ${lastHist.editedAt}</div>
+        `;
+      } else {
+        prevCard.style.display = "none";
+      }
+
+      document.getElementById("edit-modal-overlay").classList.add("active");
+    }
+
+    function closeEditModal() {
+      document.getElementById("edit-modal-overlay").classList.remove("active");
+      pendingEditItemId = null;
+    }
+
+    function confirmEditToken() {
+      const itemId = pendingEditItemId;
+      closeEditModal();
+      if (!itemId) return;
+
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const newNum = prompt("Enter New Token Number:", item.tokenNo || "");
+      if (newNum === null) return;
+
+      const newName = prompt("Enter New Item Name:", item.name);
+      if (newName === null) return;
+
+      const newPriceStr = prompt("Enter New Price (₹):", item.price);
+      if (newPriceStr === null) return;
+      const newPrice = parseFloat(newPriceStr);
+
+      if (!newName.trim() || isNaN(newPrice)) {
+        alert("Invalid inputs provided!");
+        return;
+      }
+
+      // Log previous edit state
+      const editRecord = {
+        tokenNo: item.tokenNo || "N/A",
+        name: item.name,
+        price: item.price,
+        category: item.category,
+        paidWeek: item.paidWeek,
+        editedAt: new Date().toLocaleString()
+      };
+
+      if (!item.history) item.history = [];
+      item.history.push(editRecord);
+
+      item.tokenNo = newNum.trim();
+      item.name = newName.trim();
+      item.price = newPrice;
+
+      localStorage.setItem("qhp_stock_items", JSON.stringify(items));
+      renderMenuTable(document.getElementById('menu-search').value);
+      alert(`Token ${item.tokenNo} updated successfully!`);
+    }
+
+    function showTokenHistory(itemId) {
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      document.getElementById("hist-modal-header").innerText = `History for ${item.tokenNo} (${item.name})`;
+      const body = document.getElementById("hist-modal-body");
+
+      let html = `
+        <div style="margin-bottom: 12px; font-weight:700; color: var(--qhp-blue);">
+          Current Details:
+          <div style="font-weight: normal; color: #333; font-size: 13px; margin-top: 4px;">
+            • Token: <strong>${item.tokenNo}</strong><br>
+            • Name: <strong>${item.name}</strong><br>
+            • Price: <strong>₹${item.price}</strong><br>
+            • Paid Week: <strong>${item.paidWeek || 'N/A'}</strong>
+          </div>
+        </div>
+      `;
+
+      if (item.history && item.history.length > 0) {
+        html += `<div style="font-weight:700; margin-bottom: 6px;">Previous Revisions:</div>`;
+        item.history.slice().reverse().forEach((h, idx) => {
+          html += `
+            <div class="history-card">
+              <div class="history-title">Revision #${item.history.length - idx} (${h.editedAt})</div>
+              <div>• <strong>Token:</strong> ${h.tokenNo} | <strong>Name:</strong> ${h.name}</div>
+              <div>• <strong>Price:</strong> ₹${h.price} | <strong>Category:</strong> ${h.category}</div>
+              <div>• <strong>Paid Week Record:</strong> ${h.paidWeek || 'N/A'}</div>
+            </div>
+          `;
+        });
+      } else {
+        html += `<p style="font-size: 12px; color: var(--text-muted);">No prior edits recorded for this token.</p>`;
+      }
+
+      body.innerHTML = html;
+      document.getElementById("history-modal-overlay").classList.add("active");
+    }
+
+    function closeHistoryModal() {
+      document.getElementById("history-modal-overlay").classList.remove("active");
+    }
+
+    function deleteItem(itemId) {
+      if (!confirm("Are you sure you want to delete this token?")) return;
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      items = items.filter(i => i.id !== itemId);
+      localStorage.setItem("qhp_stock_items", JSON.stringify(items));
+      renderMenuTable();
+    }
+
+    function toggleItemStock(itemId) {
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      const item = items.find(m => m.id === itemId);
+      if (item) {
+        item.available = !item.available;
+        localStorage.setItem("qhp_stock_items", JSON.stringify(items));
+        renderMenuTable(document.getElementById('menu-search').value);
+      }
+    }
+
+    function renderMenuTable(query = '') {
+      const tbody = document.getElementById('menu-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let items = JSON.parse(localStorage.getItem("qhp_stock_items")) || [];
+      const filtered = items.filter(item => 
+        item.name.toLowerCase().includes(query.toLowerCase()) || 
+        (item.tokenNo && item.tokenNo.toLowerCase().includes(query.toLowerCase()))
+      );
+      document.getElementById('menu-count').innerText = filtered.length;
+
+      filtered.forEach(item => {
+        const hasEdits = item.history && item.history.length > 0;
+        tbody.innerHTML += `
+          <tr>
+            <td style="font-weight: 800; color: var(--qhp-blue);">${item.tokenNo || '#' + item.id}</td>
+            <td style="font-weight: 600;">
+              ${item.name}
+              ${hasEdits ? `<span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:1px 5px; border-radius:3px; margin-left:4px;">Edited</span>` : ''}
+            </td>
+            <td><span style="background: #eef4ff; color: var(--qhp-blue); padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 12px;">${item.category}</span></td>
+            <td>₹${item.price}</td>
+            <td>
+              <label class="toggle-switch">
+                <input type="checkbox" ${item.available ? 'checked' : ''} onchange="toggleItemStock(${item.id})">
+                <span class="slider"></span>
+              </label>
+              <span style="margin-left: 8px; font-size: 12px; font-weight: 600; color: ${item.available ? 'var(--green-veg)' : '#dc2626'}">
+                ${item.available ? 'In Stock' : 'Out of Stock'}
+              </span>
+            </td>
+            <td>
+              <div style="font-size: 12px; font-weight: 700; color: ${item.isPaid !== false ? 'var(--green-veg)' : '#dc2626'}">
+                ${item.isPaid !== false ? '✓ Paid' : '✗ Unpaid'}
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted);">${item.paidWeek || 'Week 32, 2026'}</div>
+            </td>
+            <td>
+              <button onclick="promptEditToken(${item.id})" style="background: #e0f2fe; color: #0284c7; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600; margin-right: 4px;">Edit</button>
+              <button onclick="showTokenHistory(${item.id})" style="background: #f1f5f9; color: #475569; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600; margin-right: 4px;">Log</button>
+              <button onclick="deleteItem(${item.id})" style="background: #fee2e2; color: #dc2626; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600;">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterMenu() {
+      const q = document.getElementById('menu-search').value;
+      renderMenuTable(q);
+    }
+
+    // APP NAVIGATION
+    let currentOrderTab = 'incoming';
+    let soundOn = true;
+    let isOnline = true;
+
+    const liveOrders = [
+      {
+        id: "QHP-90182",
+        status: "incoming",
+        customer: "Ramesh K.",
+        rider: "Assigning Delivery Partner...",
+        timer: "01:45",
+        items: [
+          { name: "Potato Chips Pack", qty: 2, price: 60 },
+          { name: "Orange Juice 1L", qty: 1, price: 110 }
+        ]
+      }
+    ];
+
+    const pastOrdersHistory = [
+      { id: "QHP-90175", customer: "Suresh V.", items: "1x Basmati Rice 5kg", amount: 450, date: "Today, 02:15 PM", status: "Delivered" }
+    ];
+
+    function navigate(pageId, navElement) {
+      document.querySelectorAll('.view-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+      document.getElementById(`page-${pageId}`).classList.add('active');
+      navElement.classList.add('active');
+
+      const activeUser = JSON.parse(localStorage.getItem("qhp_active_user"));
+      const stockTitle = (activeUser && activeUser.businessType === "restaurant") ? 'Menu Management' : 'Stock Management';
+
+      const titles = {
+        'live-orders': 'Live Orders',
+        'menu-management': stockTitle,
+        'past-orders': 'Past Orders',
+        'payouts': 'Payouts & Reports',
+        'insights': 'Business Insights'
+      };
+      document.getElementById('page-title').innerText = titles[pageId];
+
+      if (pageId === 'menu-management') {
+        updateSectionDropdown();
+        renderMenuTable();
+      }
+      if (pageId === 'past-orders') renderPastOrdersTable();
+
+      toggleSidebar(false);
+    }
+
+    function renderLiveOrders() {
+      const grid = document.getElementById('orders-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const filtered = liveOrders.filter(o => o.status === currentOrderTab);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">No orders in <strong>${currentOrderTab}</strong> status right now.</div>`;
+        updateOrderCounts();
+        return;
+      }
+
+      filtered.forEach(order => {
+        const total = order.items.reduce((acc, item) => acc + item.price, 0);
+        let actionButtons = '';
+
+        if (order.status === 'incoming') {
+          actionButtons = `
+            <button class="btn btn-outline" onclick="rejectOrder('${order.id}')">Reject</button>
+            <button class="btn btn-primary-card" onclick="moveOrderStatus('${order.id}', 'preparing')">Accept Order</button>
+          `;
+        } else if (order.status === 'preparing') {
+          actionButtons = `
+            <button class="btn btn-blue" onclick="moveOrderStatus('${order.id}', 'ready')">Mark Ready for Pickup</button>
+          `;
+        } else if (order.status === 'ready') {
+          actionButtons = `
+            <button class="btn btn-primary-card" onclick="moveOrderStatus('${order.id}', 'completed')">Handover to Rider</button>
+          `;
+        } else {
+          actionButtons = `<div style="font-size: 12px; color: var(--green-veg); font-weight: 700; width: 100%; text-align: center;">✓ Order Completed</div>`;
+        }
+
+        const itemsHTML = order.items.map(item => `
+          <li class="item-row">
+            <div class="item-info">
+              <span class="qty">${item.qty}x</span>
+              <span class="item-name">${item.name}</span>
+            </div>
+            <span class="item-price">₹${item.price}</span>
+          </li>
+        `).join('');
+
+        const cardHTML = `
+          <div class="order-card ${order.status === 'incoming' ? 'urgent' : ''}">
+            <div class="card-header">
+              <span class="order-number">ID: #${order.id}</span>
+              <span class="order-timer">⏱️ ${order.timer}</span>
+            </div>
+            <div class="card-subheader">
+              <span>Cust: ${order.customer}</span>
+              <span>${order.rider}</span>
+            </div>
+            <div class="card-body">
+              <ul class="item-list">${itemsHTML}</ul>
+              <div style="margin-top: 12px; padding-top: 8px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; font-weight: 700; font-size: 13px;">
+                <span>Total Bill</span>
+                <span>₹${total}</span>
+              </div>
+            </div>
+            <div class="card-footer">${actionButtons}</div>
+          </div>
+        `;
+
+        grid.innerHTML += cardHTML;
+      });
+
+      updateOrderCounts();
+    }
+
+    function moveOrderStatus(orderId, newStatus) {
+      const order = liveOrders.find(o => o.id === orderId);
+      if (order) {
+        order.status = newStatus;
+        if (newStatus === 'preparing') order.timer = 'Packing items';
+        if (newStatus === 'ready') order.timer = 'Rider at store';
+        if (newStatus === 'completed') order.timer = 'Completed';
+        renderLiveOrders();
+      }
+    }
+
+    function rejectOrder(orderId) {
+      const idx = liveOrders.findIndex(o => o.id === orderId);
+      if (idx > -1) {
+        liveOrders.splice(idx, 1);
+        renderLiveOrders();
+      }
+    }
+
+    function switchOrderTab(tabName) {
+      currentOrderTab = tabName;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      renderLiveOrders();
+    }
+
+    function updateOrderCounts() {
+      const counts = {
+        incoming: liveOrders.filter(o => o.status === 'incoming').length,
+        preparing: liveOrders.filter(o => o.status === 'preparing').length,
+        ready: liveOrders.filter(o => o.status === 'ready').length,
+        completed: liveOrders.filter(o => o.status === 'completed').length + 12
+      };
+
+      document.getElementById('count-incoming').innerText = counts.incoming;
+      document.getElementById('count-preparing').innerText = counts.preparing;
+      document.getElementById('count-ready').innerText = counts.ready;
+      document.getElementById('count-completed').innerText = counts.completed;
+      document.getElementById('nav-badge').innerText = counts.incoming;
+    }
+
+    function renderPastOrdersTable(query = '') {
+      const tbody = document.getElementById('past-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = pastOrdersHistory.filter(o => 
+        o.id.toLowerCase().includes(query.toLowerCase()) || 
+        o.customer.toLowerCase().includes(query.toLowerCase())
+      );
+
+      filtered.forEach(o => {
+        tbody.innerHTML += `
+          <tr>
+            <td style="font-weight: 700;">#${o.id}</td>
+            <td>${o.customer}</td>
+            <td>${o.items}</td>
+            <td style="font-weight: 600;">₹${o.amount}</td>
+            <td>${o.date}</td>
+            <td>
+              <span style="font-weight: 700; color: ${o.status === 'Delivered' ? 'var(--green-veg)' : '#dc2626'};">
+                ${o.status}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterPastOrders() {
+      const q = document.getElementById('past-search').value;
+      renderPastOrdersTable(q);
+    }
+
+    function toggleOutletStatus() {
+      isOnline = !isOnline;
+      const el = document.getElementById('status-toggle');
+      const text = document.getElementById('status-text');
+      if (isOnline) {
+        el.classList.remove('offline');
+        text.innerText = 'ONLINE & ACCEPTING';
+      } else {
+        el.classList.add('offline');
+        text.innerText = 'OFFLINE (STORE CLOSED)';
+      }
+    }
+
+    function toggleSound() {
+      soundOn = !soundOn;
+      document.getElementById('sound-btn').innerText = soundOn ? '🔊 Sound Alerts: ON' : '🔇 Sound Alerts: OFF';
+    }
+  </script>
+</body>
+</html>
